@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inpoburn Hub | Burn & Claim IB Token</title>
+    <meta name="description" content="Burn any ERC20 token and claim 1 IB token instantly.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <link rel="stylesheet" href="inpohub.css">
+</head>
+<body>
+
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div><div class="ember"></div><div class="ember"></div>
+<div class="ember"></div>
+<div class="spark"></div><div class="spark"></div><div class="spark"></div>
+<div class="spark"></div><div class="spark"></div><div class="spark"></div>
+<div class="spark"></div><div class="spark"></div>
+<div class="flame-base" aria-hidden="true">
+    <div class="flame-spike"></div><div class="flame-spike"></div><div class="flame-spike"></div>
+    <div class="flame-spike"></div><div class="flame-spike"></div><div class="flame-spike"></div>
+    <div class="flame-spike"></div><div class="flame-spike"></div><div class="flame-spike"></div>
+    <div class="flame-spike"></div><div class="flame-spike"></div><div class="flame-spike"></div>
+    <div class="flame-spike"></div><div class="flame-spike"></div><div class="flame-spike"></div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-logo">🔥 InpoBurn Hub</div>
+    <div class="nav-links">
+        <button class="nav-link" onclick="openInfoModal('how')" data-i18n="nav.how">How It Works</button>
+        <button class="nav-link" onclick="openInfoModal('tos')" data-i18n="nav.tos">ToS</button>
+        <button class="nav-link" onclick="openInfoModal('faq')" data-i18n="nav.faq">FAQ</button>
+        <button class="nav-link" onclick="openInfoModal('risk')" data-i18n="nav.risk">Risks</button>
+    </div>
+</nav>
+
+<div id="walletOverlay" class="wallet-overlay" role="dialog" aria-modal="true">
+    <div class="wallet-modal">
+        <button class="wallet-modal-close" id="modalClose" aria-label="Close">✕</button>
+        <div class="wallet-modal-title">🔥 Connect Wallet</div>
+        <div class="wallet-modal-sub" data-i18n="wallet.sub">// choose your wallet //</div>
+        <div class="wallet-list">
+            <button class="wallet-option" data-wallet="metamask">
+                <div class="wallet-icon">🦊</div>
+                <div class="wallet-info-text">
+                    <span class="wallet-name">MetaMask</span>
+                    <span class="wallet-status" id="status-metamask" data-i18n="wallet.detecting">Detecting...</span>
+                </div>
+                <span class="wallet-arrow">▶</span>
+            </button>
+            <button class="wallet-option" data-wallet="trust">
+                <div class="wallet-icon">🛡️</div>
+                <div class="wallet-info-text">
+                    <span class="wallet-name">Trust Wallet</span>
+                    <span class="wallet-status" id="status-trust" data-i18n="wallet.detecting">Detecting...</span>
+                </div>
+                <span class="wallet-arrow">▶</span>
+            </button>
+            <button class="wallet-option" data-wallet="coinbase">
+                <div class="wallet-icon">🔵</div>
+                <div class="wallet-info-text">
+                    <span class="wallet-name">Coinbase Wallet</span>
+                    <span class="wallet-status" id="status-coinbase" data-i18n="wallet.detecting">Detecting...</span>
+                </div>
+                <span class="wallet-arrow">▶</span>
+            </button>
+            <button class="wallet-option" data-wallet="browser">
+                <div class="wallet-icon">🌐</div>
+                <div class="wallet-info-text">
+                    <span class="wallet-name">Browser Wallet</span>
+                    <span class="wallet-status" id="status-browser" data-i18n="wallet.detecting">Detecting...</span>
+                </div>
+                <span class="wallet-arrow">▶</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="signinOverlay" class="signin-overlay" role="dialog" aria-modal="true">
+    <div class="signin-modal">
+        <div class="signin-flame-deco" aria-hidden="true">🔐</div>
+        <div class="signin-title">Verify You're Human</div>
+        <div class="signin-sub" id="signinSubText">// anti-bot wallet verification //</div>
+        <div class="signin-addr-box" id="signinAddrBox"></div>
+        <div class="signin-desc" id="signinDesc">
+            Sign a message to confirm you own this wallet. This is <strong>free</strong> — no gas, no transaction.<br>
+            <span style="color:#ff5500;font-size:.75em;margin-top:4px;display:inline-block;">⚠️ Required to unlock the Burn feature.</span>
+        </div>
+        <div class="signin-msg-box" id="signinMsgBox"></div>
+        <button class="signin-btn" id="signinBtn">✍️ Sign to Verify</button>
+        <button class="signin-skip" id="signinSkip" style="opacity:.5;font-size:.65rem;">Skip (Burn will be locked)</button>
+        <div class="signin-status" id="signinStatus"></div>
+        <div class="signin-notice">🔒 Signature never leaves your browser · Anti-bot protection</div>
+    </div>
+</div>
+
+<div id="modal-how" class="info-overlay" role="dialog" aria-modal="true">
+    <div class="info-modal">
+        <button class="info-modal-close" onclick="closeInfoModal('how')">✕</button>
+        <h3>⚙️ <span data-i18n="modal.how.title">How It Works</span></h3>
+        <div class="modal-sub" data-i18n="modal.how.sub">// burn & claim mechanism //</div>
+        <p data-i18n="modal.how.p1">Inpoburn Hub allows anyone to burn any ERC20 token on a supported blockchain network and receive 1 IB (Inpoburn) token in return.</p>
+        <h4 data-i18n="modal.how.steps">Steps</h4>
+        <p data-i18n="modal.how.s1">1. Connect your wallet to a supported network.</p>
+        <p data-i18n="modal.how.s2">2. Enter the ERC20 token address you want to burn.</p>
+        <p data-i18n="modal.how.s3">3. Set the amount (min. 1 whole token).</p>
+        <p data-i18n="modal.how.s4">4. Click <span class="highlight">Approve &amp; Burn</span> — wallet will prompt two transactions: approve and burn.</p>
+        <p data-i18n="modal.how.s5">5. After blockchain confirmation, 1 IB token is sent to your wallet automatically.</p>
+        <h4 data-i18n="modal.how.sc">Smart Contract</h4>
+        <p data-i18n="modal.how.scp">The burn process is fully on-chain through the <span class="highlight">UniversalBurner</span> contract. Burned tokens are sent to the dead address (0x000...dEaD) and cannot be recovered.</p>
+    </div>
+</div>
+
+<div id="modal-tos" class="info-overlay" role="dialog" aria-modal="true">
+    <div class="info-modal">
+        <button class="info-modal-close" onclick="closeInfoModal('tos')">✕</button>
+        <h3>📜 <span data-i18n="modal.tos.title">Terms of Service</span></h3>
+        <div class="modal-sub" data-i18n="modal.tos.sub">// terms & conditions of use //</div>
+        <h4 data-i18n="modal.tos.h1">1. Acceptance of Terms</h4>
+        <p data-i18n="modal.tos.p1">By using Inpoburn Hub, you agree to all applicable terms and conditions. If you disagree, please stop using this service.</p>
+        <h4 data-i18n="modal.tos.h2">2. Nature of Service</h4>
+        <p data-i18n="modal.tos.p2">Inpoburn Hub is an experimental dApp running on supported blockchain networks. This service is provided <span class="highlight">"as is"</span> without any warranty.</p>
+        <h4 data-i18n="modal.tos.h3">3. User Risk</h4>
+        <p data-i18n="modal.tos.p3">You are solely responsible for every transaction made. Burned tokens <span class="highlight">cannot be returned</span> under any circumstance.</p>
+        <h4 data-i18n="modal.tos.h4">4. Limitation of Liability</h4>
+        <p data-i18n="modal.tos.p4">The Inpoburn team is not responsible for asset loss, transaction failure, or any damage arising from use of this platform.</p>
+        <h4 data-i18n="modal.tos.h5">5. Prohibited Uses</h4>
+        <ul>
+            <li data-i18n="modal.tos.l1">Using the platform for illegal purposes</li>
+            <li data-i18n="modal.tos.l2">Attempting to exploit the smart contract</li>
+            <li data-i18n="modal.tos.l3">Spreading false information about the platform</li>
+        </ul>
+        <h4 data-i18n="modal.tos.h6">6. Service Changes</h4>
+        <p data-i18n="modal.tos.p6">We reserve the right to modify, suspend, or terminate the service at any time without prior notice.</p>
+        <h4 data-i18n="modal.tos.h7">7. Governing Law</h4>
+        <p data-i18n="modal.tos.p7">These terms are governed by generally applicable international contract law principles.</p>
+    </div>
+</div>
+
+<div id="modal-faq" class="info-overlay" role="dialog" aria-modal="true">
+    <div class="info-modal">
+        <button class="info-modal-close" onclick="closeInfoModal('faq')">✕</button>
+        <h3>❓ <span data-i18n="modal.faq.title">FAQ</span></h3>
+        <div class="modal-sub" data-i18n="modal.faq.sub">// frequently asked questions //</div>
+        <h4 data-i18n="modal.faq.q1">What tokens can be burned?</h4>
+        <p data-i18n="modal.faq.a1">Any valid ERC20 token on the supported network. Make sure you have enough tokens and ETH for gas fees.</p>
+        <h4 data-i18n="modal.faq.q2">What is the minimum burn amount?</h4>
+        <p data-i18n="modal.faq.a2">Minimum <span class="highlight">1 whole token</span> (integer). Decimal values like 0.5 or 0.9 are not accepted.</p>
+        <h4 data-i18n="modal.faq.q3">Can I receive more than 1 IB?</h4>
+        <p data-i18n="modal.faq.a3">Each burn transaction yields exactly <span class="highlight">1 IB token</span>, regardless of how many tokens you burn.</p>
+        <h4 data-i18n="modal.faq.q4">Which networks are supported?</h4>
+        <p data-i18n="modal.faq.a4">Inpoburn Hub supports major blockchain networks. The platform will show available network options when you connect your wallet.</p>
+        <h4 data-i18n="modal.faq.q5">Are there platform fees?</h4>
+        <p data-i18n="modal.faq.a5">No platform fees. You only pay the gas fee of the blockchain network you are using.</p>
+        <h4 data-i18n="modal.faq.q6">What network does Inpoburn use?</h4>
+        <p data-i18n="modal.faq.a6">Inpoburn Hub runs on Base Mainnet (Chain ID 8453). Make sure your wallet is connected to Base and you have ETH on Base for gas fees.</p>
+        <h4 data-i18n="modal.faq.q7">Why did my transaction fail?</h4>
+        <p data-i18n="modal.faq.a7">Possible causes: invalid token, insufficient balance, or a congested network. Check your transaction on the network's block explorer.</p>
+    </div>
+</div>
+
+<div id="modal-risk" class="info-overlay" role="dialog" aria-modal="true">
+    <div class="info-modal">
+        <button class="info-modal-close" onclick="closeInfoModal('risk')">✕</button>
+        <h3>⚠️ <span data-i18n="modal.risk.title">Risk Disclaimer</span></h3>
+        <div class="modal-sub" data-i18n="modal.risk.sub">// important risk information //</div>
+        <h4 data-i18n="modal.risk.h1">Irreversibility Risk</h4>
+        <p data-i18n="modal.risk.p1">Blockchain transactions are <span class="highlight">permanent and cannot be reversed</span>. Once tokens are burned, the process cannot be undone under any circumstance.</p>
+        <h4 data-i18n="modal.risk.h2">Smart Contract Risk</h4>
+        <p data-i18n="modal.risk.p2">Although the contract has been tested, all smart contracts carry potential bugs. Use only amounts you are prepared to lose.</p>
+        <h4 data-i18n="modal.risk.h3">Network Risk</h4>
+        <p data-i18n="modal.risk.p3">Network congestion can cause transactions to be delayed or fail. Gas fees can fluctuate significantly.</p>
+        <h4 data-i18n="modal.risk.h4">Token Risk</h4>
+        <p data-i18n="modal.risk.p4">Always verify the token address before burning. Fake tokens or tokens with special mechanics (fee-on-transfer, rebase) may not work correctly.</p>
+        <h4 data-i18n="modal.risk.h5">Live Mainnet Platform</h4>
+        <p data-i18n="modal.risk.p5">Inpoburn runs on Base Mainnet. IB tokens claimed are live on-chain and carry real network value. All transactions are final.</p>
+        <h4 data-i18n="modal.risk.h6">Important Advice</h4>
+        <ul>
+            <li data-i18n="modal.risk.l1">Always verify the contract address before transacting</li>
+            <li data-i18n="modal.risk.l2">Never burn tokens that have important value to you</li>
+            <li data-i18n="modal.risk.l3">Make sure you are connected to the correct network</li>
+            <li data-i18n="modal.risk.l4">Use the minimum amount for your first attempt</li>
+        </ul>
+    </div>
+</div>
+
+<div class="page-wrap">
+    <section class="hero">
+        <div class="hero-banner">
+            <svg class="hero-banner-svg" viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="350" cy="130" rx="320" ry="55" fill="#cc1a00" opacity="0.18"/>
+                <ellipse cx="350" cy="140" rx="220" ry="35" fill="#ff5500" opacity="0.12"/>
+                <g transform="translate(120,50)">
+                    <ellipse cx="0" cy="52" rx="34" ry="8" fill="#ff5500" opacity="0.25"/>
+                    <circle cx="0" cy="28" r="32" fill="url(#coinGrad1)"/>
+                    <circle cx="0" cy="28" r="26" fill="url(#coinInner1)" opacity="0.7"/>
+                    <text x="0" y="34" text-anchor="middle" font-family="'Bungee',cursive" font-size="14" fill="#fff7a0" letter-spacing="0">DUST ERC20</text>
+                    <circle cx="0" cy="28" r="32" fill="none" stroke="#ff9900" stroke-width="1.5" opacity="0.6"/>
+                </g>
+                <g transform="translate(580,50)">
+                    <ellipse cx="0" cy="52" rx="34" ry="8" fill="#ff5500" opacity="0.25"/>
+                    <circle cx="0" cy="28" r="32" fill="url(#coinGrad2)"/>
+                    <circle cx="0" cy="28" r="26" fill="url(#coinInner2)" opacity="0.7"/>
+                    <text x="0" y="34" text-anchor="middle" font-family="'Bungee',cursive" font-size="14" fill="#0f0804" letter-spacing="0">IB</text>
+                    <circle cx="0" cy="28" r="32" fill="none" stroke="#ffcc55" stroke-width="1.5" opacity="0.7"/>
+                </g>
+                <g transform="translate(175,70)">
+                    <line x1="0" y1="0" x2="90" y2="0" stroke="#ff5500" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+                    <polygon points="90,0 82,-4 82,4" fill="#ff5500" opacity="0.7"/>
+                </g>
+                <g transform="translate(435,70)">
+                    <line x1="0" y1="0" x2="90" y2="0" stroke="#ffcc55" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+                    <polygon points="90,0 82,-4 82,4" fill="#ffcc55" opacity="0.7"/>
+                </g>
+                <g transform="translate(350,10)">
+                    <path d="M-22 85 C-22 85 -32 65 -32 50 C-32 30 -16 12 -10 5 C-10 5 -8 25 -8 40 C-8 55 -18 72 -22 85Z" fill="url(#hfL)" opacity="0.85"/>
+                    <path d="M22 85 C22 85 32 65 32 50 C32 30 16 12 10 5 C10 5 8 25 8 40 C8 55 18 72 22 85Z" fill="url(#hfR)" opacity="0.85"/>
+                    <path d="M0 90 C0 90 -24 68 -24 48 C-24 22 0 0 0 0 C0 0 24 22 24 48 C24 68 0 90 0 90Z" fill="url(#hfC)"/>
+                    <path d="M0 78 C0 78 -13 62 -13 50 C-13 35 0 22 0 22 C0 22 13 35 13 50 C13 62 0 78 0 78Z" fill="url(#hfI)"/>
+                    <ellipse cx="0" cy="65" rx="8" ry="11" fill="#fff7a0" opacity="0.85"/>
+                    <text x="0" y="70" text-anchor="middle" font-family="'Bungee',cursive" font-size="8" fill="#0f0804" letter-spacing="1">BURN</text>
+                    <ellipse cx="0" cy="91" rx="26" ry="6" fill="#ff5500" opacity="0.3"/>
+                </g>
+                <defs>
+                    <radialGradient id="coinGrad1" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#3a1800"/><stop offset="100%" stop-color="#1a0800"/></radialGradient>
+                    <radialGradient id="coinInner1" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#ff5500" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+                    <radialGradient id="coinGrad2" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#5c3a00"/><stop offset="100%" stop-color="#2a1800"/></radialGradient>
+                    <radialGradient id="coinInner2" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#ffcc55" stop-opacity="0.4"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+                    <radialGradient id="hfL" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#ff5500"/><stop offset="100%" stop-color="#cc1a00" stop-opacity="0"/></radialGradient>
+                    <radialGradient id="hfR" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#ff5500"/><stop offset="100%" stop-color="#cc1a00" stop-opacity="0"/></radialGradient>
+                    <radialGradient id="hfC" cx="50%" cy="85%" r="65%"><stop offset="0%" stop-color="#ff5500"/><stop offset="60%" stop-color="#ff9900"/><stop offset="100%" stop-color="#cc1a00" stop-opacity="0.2"/></radialGradient>
+                    <radialGradient id="hfI" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#ffcc55"/><stop offset="100%" stop-color="#ff9900" stop-opacity="0.4"/></radialGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <h1 class="hero-title">🔥 Inpoburn Hub</h1>
+        <p class="hero-sub" data-i18n="hero.sub">// burn any erc20 token → claim 1 IB token instantly //</p>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">∞</span>
+                <span class="stat-label" data-i18n="stats.tokens">All_Tokens_Supported</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">1:1</span>
+                <span class="stat-label" data-i18n="stats.ratio">Burn → IB Ratio</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">ERC20</span>
+                <span class="stat-label" data-i18n="stats.standard">Standard</span>
+            </div>
+            <div class="stat-item stat-item-live">
+                <span class="stat-value" id="liveBurnCount"><span class="stat-loading">🔥</span></span>$IB
+                <span class="stat-label">Total_Supply</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <aside class="info-card">
+            <div class="info-block">
+                <div class="info-block-title">⚡ <span data-i18n="sidebar.guide">Quick Guide</span></div>
+                <div class="info-step">
+                    <span class="step-num">01</span>
+                    <span class="step-text" data-i18n="sidebar.step1">Connect your wallet to a supported network (auto-switch)</span>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">02</span>
+                    <span class="step-text" data-i18n="sidebar.step2">Enter the ERC20 token address to burn</span>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">03</span>
+                    <span class="step-text" data-i18n="sidebar.step3">Set the amount (min. 1 whole token)</span>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">04</span>
+                    <span class="step-text" data-i18n="sidebar.step4">Approve & Burn — receive 1 IB token!</span>
+                </div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">📋 Contract</div>
+                <p style="margin-bottom:6px;font-size:.6rem;color:var(--text-ash);">BURNER CONTRACT</p>
+                <div class="contract-addr" id="contractAddrDisplay" onclick="copyContractBURNER_CONTRACT_ADDRESS()" data-i18n-title="sidebar.copy" title="Click to copy">
+                    0xB5E17d760192Dd896e49022BcC491D167085D61D
+                </div>
+                <a href="https://basescan.org/address/0xB5E17d760192Dd896e49022BcC491D167085D61D" target="_blank" rel="noopener"
+                   style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--fire-inner);letter-spacing:.06em;" data-i18n="sidebar.explorer">
+                    View on Explorer ↗
+                </a>
+                <p>---------------------------------</p>
+                <p style="margin-bottom:6px;font-size:.6rem;color:var(--text-ash);">IB TOKEN CONTRACT</p>
+                <div class="contract-addr" id="contractAddrDisplayIB_TOKEN_CONTRACT_ADDRESS" onclick="copyContractIB_TOKEN_CONTRACT()" data-i18n-title="sidebar.copy" title="Click to copy">
+                    0xD733C347BaC49cb55cF9498b5f25FB00BAc3ad59
+                </div>
+                <a href="https://basescan.org/address/0xD733C347BaC49cb55cF9498b5f25FB00BAc3ad59" target="_blank" rel="noopener"
+                   style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--fire-inner);letter-spacing:.06em;" data-i18n="sidebar.explorer">
+                    View on Explorer ↗
+                </a>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">🌐 Community</div>
+                <div class="footer-socials" style="flex-direction:column;gap:6px;">
+                    <a class="social-btn" href="https://t.me/airdropiac" target="_blank" rel="noopener"><span class="social-icon">✈</span> Telegram</a>
+                    <a class="social-btn" display="disabled" target="_blank" rel="noopener"><span class="social-icon">⌥</span> GitHub</a>
+                </div>
+            </div>
+        </aside>
+
+        <div class="card">
+            <div class="logo-wrap">
+                <div class="logo-img-wrap">
+                    <svg class="logo-svg" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40 5 C40 5 60 28 60 48 C60 62 52 72 40 78 C28 72 20 62 20 48 C20 28 40 5 40 5Z" fill="url(#flameOuter)" opacity="0.9"/>
+                        <path d="M40 18 C40 18 55 35 55 50 C55 61 49 68 40 73 C31 68 25 61 25 50 C25 35 40 18 40 18Z" fill="url(#flameMid)"/>
+                        <path d="M40 32 C40 32 50 44 50 53 C50 61 46 65 40 68 C34 65 30 61 30 53 C30 44 40 32 40 32Z" fill="url(#flameInner)"/>
+                        <ellipse cx="40" cy="60" rx="7" ry="9" fill="url(#flameCore)" opacity="0.95"/>
+                        <text x="40" y="65" text-anchor="middle" font-family="'Bungee', cursive" font-size="10" font-weight="700" fill="#0f0804" letter-spacing="1">IB</text>
+                        <defs>
+                            <radialGradient id="flameOuter" cx="50%" cy="80%" r="70%"><stop offset="0%" stop-color="#cc1a00"/><stop offset="100%" stop-color="#ff5500" stop-opacity="0"/></radialGradient>
+                            <radialGradient id="flameMid" cx="50%" cy="75%" r="60%"><stop offset="0%" stop-color="#ff5500"/><stop offset="100%" stop-color="#ff9900" stop-opacity="0.3"/></radialGradient>
+                            <radialGradient id="flameInner" cx="50%" cy="70%" r="55%"><stop offset="0%" stop-color="#ff9900"/><stop offset="100%" stop-color="#fff7a0" stop-opacity="0.5"/></radialGradient>
+                            <radialGradient id="flameCore" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff7a0"/><stop offset="100%" stop-color="#ffcc55"/></radialGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+            <h2 data-i18n="card.title">Burn & Claim</h2>
+            <div class="tagline" data-i18n="card.tagline">// approve → burn → receive 1 IB //</div>
+            <div class="divider"><div class="refresh-bar-wrap" id="refreshBarWrap">
+        </div></div>
+
+            <button id="connectBtn" class="btn-connect" data-i18n="card.connect">⚡ Connect Wallet</button>
+
+            <div id="walletBox" class="wallet-info">
+                <span class="wallet-dot"></span>
+                <span id="walletAddr"></span>
+                <button id="disconnectWalletBtn" class="btn-disconnect" title="Disconnect Wallet">✖</button>
+            </div>
+
+            <label for="tokenAddr" data-i18n="card.tokenLabel">Token Address to Burn</label>
+            <div id="tokenPickerWrap" style="display:none;margin-bottom:8px;">
+                <div style="font-size:.6rem;color:var(--text-ash);margin-bottom:4px;letter-spacing:.06em;" data-i18n="card.pickerHint">
+                    📂 SELECT FROM WALLET — or type manually below
+                </div>
+                <div id="tokenPickerList" style="background:var(--card-bg);border:1px solid var(--border-dim);border-radius:6px;max-height:200px;overflow-y:auto;font-family:'Share Tech Mono',monospace;">
+                    <div id="tokenPickerLoading" style="padding:12px;font-size:.65rem;color:var(--text-ash);text-align:center;" data-i18n="card.pickerLoading">
+                        ⏳ Loading tokens...
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-wrap" style="position:relative;">
+                <input type="text" id="tokenAddr" data-i18n-placeholder="card.tokenPlaceholder" placeholder="0x123... (or select from list above)" autocomplete="off" spellcheck="false">
+                <div id="tokenInfoBadge" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.6rem;color:var(--fire-inner);letter-spacing:.04em;background:rgba(255,80,0,.1);padding:2px 6px;border-radius:4px;pointer-events:none;"></div>
+            </div>
+
+            <label for="amount" data-i18n="card.amountLabel">Amount (Min 1 Token, Integer Only)</label>
+            <div class="input-wrap" style="position:relative;">
+                <input type="number" id="amount" placeholder="1" min="1" step="1" style="padding-right: 60px;">
+                <button id="btnMax" class="btn-max">MAX</button>
+            </div>
+
+            <div class="tos-row">
+                <input type="checkbox" id="tosCheck" class="tos-check">
+                <label for="tosCheck" class="tos-label">
+                    <span data-i18n="card.tosAgree">I have read and agree to the</span>
+                    <button class="tos-link" onclick="openInfoModal('tos')" data-i18n="card.tosTos">Terms of Service</button>
+                    &amp;
+                    <button class="tos-link" onclick="openInfoModal('risk')" data-i18n="card.tosRisk">Risk Disclaimer</button>
+                </label>
+            </div>
+
+            <button id="burnBtn" class="btn-primary" disabled data-i18n="card.burnBtn">🔥 Approve &amp; Burn</button>
+
+            <div id="status" data-i18n="card.statusWaiting">[ Waiting for wallet connection... ]</div>
+        </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="nav-logo">🔥 Inpoburn Hub</div>
+                <p data-i18n="footer.desc">Experimental burn-to-claim ERC20 token platform on blockchain. Not financial advice. Use wisely.</p>
+            </div>
+            <div>
+                <div class="footer-col-title" data-i18n="footer.platform">Platform</div>
+                <ul class="footer-links">
+                    <li><button onclick="openInfoModal('how')" data-i18n="nav.how">How It Works</button></li>
+                    <li><button onclick="openInfoModal('faq')" data-i18n="nav.faq">FAQ</button></li>
+                    <li><a href="https://basescan.org/address/0xB5E17d760192Dd896e49022BcC491D167085D61D" target="_blank" rel="noopener" data-i18n="sidebar.explorer">Contract Explorer ↗</a></li>
+                    <li><a href="https://bridge.base.org/" target="_blank" rel="noopener" data-i18n="footer.faucet">Bridge to Base ↗</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title" data-i18n="footer.legal">Legal</div>
+                <ul class="footer-links">
+                    <li><button onclick="openInfoModal('tos')" data-i18n="nav.tos">Terms of Service</button></li>
+                    <li><button onclick="openInfoModal('risk')" data-i18n="nav.risk">Risk Disclaimer</button></li>
+                    <li><button onclick="openInfoModal('faq')" data-i18n="nav.faq">FAQ</button></li>
+                </ul>
+                <div style="margin-top:16px;">
+    <div class="footer-col-title" data-i18n="footer.community">Community</div>
+    <div class="footer-socials">
+        <a class="social-btn" href="https://t.me/airdropiac" target="_blank" rel="noopener"><span class="social-icon">✈</span> TELEGRAM</a>
+    </div>
+
+    <div style="margin-top:12px; padding: 8px; background: rgba(255,153,0,0.05); border: 1px dashed var(--fire-inner); border-radius: 2px; text-align: center;">
+        <div data-i18n="footer.coffee" style="font-size: 0.7rem; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; font-weight: bold;">
+            ☕ Buy Me a Coffee (Base/ETH)
+        </div>
+        
+        <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--fire-inner); word-break: break-all; cursor: pointer; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 2px;" 
+             onclick="copyCoffeeAddress()"
+             title="Click to copy address">
+            0x4521226C7d9979CD3f1779E9423488224B4D1222
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy" data-i18n="footer.copy">© 2026 Inpoburn Hub · All rights reserved</div>
+        </div>
+    </footer>
+
+    <div class="lang-bar">
+        <div class="lang-bar-inner">
+            <span class="lang-bar-label" data-i18n="lang.label">🌐 Language</span>
+            <div class="lang-btn-group">
+                <button id="langEN" class="lang-btn active" onclick="setLang('en')">
+                    <span class="lang-flag">🇺🇸</span> English
+                </button>
+                <button id="langID" class="lang-btn" onclick="setLang('id')">
+                    <span class="lang-flag">🇮🇩</span> Indonesia
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="inpohub.js"></script>
+</body>
+</html>
