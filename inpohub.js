@@ -100,9 +100,8 @@ const TRANSLATIONS = {
     'footer.legal': 'Legal',
     'footer.community': 'Community',
     'footer.faucet': 'Bridge to Base ↗',
-    'footer.copy': '© 2025 Inpoburn Hub · All rights reserved · Base Mainnet',
+    'footer.copy': '© 2025 Inpoburn Hub · All rights reserved',
     'lang.label': '🌐 Language',
-    /* status messages (dynamic) */
     'status.waiting':     '[ Waiting for wallet connection... ]',
     'status.connecting':  '[ ⏳ Connecting wallet... ]',
     'status.checknet':    '[ 🔄 Checking network... ]',
@@ -132,14 +131,12 @@ const TRANSLATIONS = {
     'status.signinRequired': '[ 🔐 Sign the message in your wallet to unlock burn! ]',
     'status.signedIn':    '[ ✅ Verified! Wallet confirmed — ready to burn. ]',
     'status.signSkipped': '[ 🔒 Burn locked. Sign message to verify you\'re human. ]',
-    /* token picker dynamic */
     'picker.detecting': '⏳ Detecting ERC20 tokens in wallet...',
     'picker.scanning':  (from, to, i, max) => `🔍 Scanning block ${from}–${to} (${i}/${max})...`,
     'picker.checking':  (n) => `🔎 Checking ${n} token contracts...`,
     'picker.none':      (n) => `⚠️ No ERC20 tokens detected in last ~${n} blocks.`,
     'picker.empty':     '⚠️ No ERC20 tokens with balance > 0 found.',
     'picker.error':     '❌ Failed to load tokens. Type address manually.',
-    /* wallet modal */
     'wallet.install':   (key) => `${key} not detected.\nOpen installation page?`,
     'wallet.nowallet':  '[ ❌ No wallet detected. ]',
 	'footer.community': 'Community',
@@ -177,7 +174,7 @@ const TRANSLATIONS = {
     'card.tosAgree': 'Saya telah membaca dan menyetujui',
     'card.tosTos': 'Syarat & Ketentuan',
     'card.tosRisk': 'Disclaimer Risiko',
-    'card.burnBtn': '🔥 Approve & Bakar',
+    'card.burnBtn': '🔥 Setujui & Bakar',
     'card.statusWaiting': '[ Menunggu koneksi wallet... ]',
     'modal.how.title': 'Cara Kerja',
     'modal.how.sub': '// mekanisme burn & claim //',
@@ -246,9 +243,8 @@ const TRANSLATIONS = {
     'footer.legal': 'Legal',
     'footer.community': 'Komunitas',
     'footer.faucet': 'Bridge to Base ↗',
-    'footer.copy': '© 2025 Inpoburn Hub · Hak cipta dilindungi · Base Mainnet',
+    'footer.copy': '© 2025 Inpoburn Hub · Hak cipta dilindungi',
     'lang.label': '🌐 Bahasa',
-    /* status messages */
     'status.waiting':     '[ Menunggu koneksi wallet... ]',
     'status.connecting':  '[ ⏳ Menghubungkan wallet... ]',
     'status.checknet':    '[ 🔄 Mengecek network... ]',
@@ -1440,9 +1436,6 @@ const tosCheck      = document.getElementById('tosCheck');
 
 let provider, signer, burnerContract, walletConnected = false, userSigned = false;
 
-/* ══════════════════════════════════════════
-   INFO MODALS
-   ══════════════════════════════════════════ */
 function openInfoModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
 function closeInfoModal(id) { document.getElementById('modal-' + id).classList.remove('open'); }
 
@@ -1483,7 +1476,7 @@ function updateBurnBtn() {
         burnBtn.disabled = false;
     } else {
         burnBtn.removeAttribute('data-locked');
-        burnBtn.textContent = currentLang === 'id' ? '🔥 Approve & Bakar' : '🔥 Approve & Burn';
+        burnBtn.textContent = currentLang === 'id' ? '🔥 Setujui & Bakar' : '🔥 Approve & Burn';
         burnBtn.title = '';
         burnBtn.disabled = !ready;
     }
@@ -1508,91 +1501,132 @@ function createTokenAvatarSVG(sym) {
 }
 
 async function fetchWalletTokens(userAddress) {
-    const wrap    = document.getElementById('tokenPickerWrap');
-    const list    = document.getElementById('tokenPickerList');
-    const loading = document.getElementById('tokenPickerLoading');
+    const wrap = document.getElementById('tokenPickerWrap');
+    const list = document.getElementById('tokenPickerList');
 
-    wrap.style.display    = 'block';
-    loading.style.display = 'block';
-    loading.textContent   = "Attempting to sync tokens...";
+    wrap.style.display = 'block';
+
+    const setMsg = (html) => { list.innerHTML = `<div style="padding:14px;font-size:.65rem;color:var(--text-ash);text-align:center;">${html}</div>`; };
+    const setError = (msg) => {
+        list.innerHTML = `
+            <div style="padding:16px;text-align:center;">
+                <div style="font-size:.65rem;color:var(--text-ash);margin-bottom:10px;">${msg}</div>
+                <button onclick="fetchWalletTokens('${userAddress}')"
+                    style="background:var(--fire-outer);color:#fff;border:none;padding:5px 12px;font-size:.6rem;cursor:pointer;border-radius:2px;margin-right:6px;">
+                    🔄 ${currentLang === 'id' ? 'Coba Lagi' : 'Retry'}
+                </button>
+                <button onclick="document.getElementById('tokenPickerWrap').style.display='none'"
+                    style="background:#333;color:#aaa;border:none;padding:5px 12px;font-size:.6rem;cursor:pointer;border-radius:2px;">
+                    ${currentLang === 'id' ? 'Input Manual' : 'Enter Manually'}
+                </button>
+            </div>`;
+    };
+
+    setMsg('⏳ ' + (currentLang === 'id' ? 'Memuat token dari wallet...' : 'Loading tokens from wallet...'));
 
     const cleanAddr = userAddress.toLowerCase();
-    const proxy = "https://api.allorigins.win/raw?url=";
-    const apiUrl = `https://base.blockscout.com/api/v2/addresses/${cleanAddr}/token-balances`;
+    const endpoints = [
+        `https://base.blockscout.com/api/v2/addresses/${cleanAddr}/token-balances`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://base.blockscout.com/api/v2/addresses/${cleanAddr}/token-balances`)}`,
+    ];
 
-    try {
-        let response;
+    let items = [];
+    let apiSuccess = false;
+
+    for (const url of endpoints) {
         try {
-            response = await fetch(apiUrl);
+            const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+            if (!res.ok) continue;
+            const data = await res.json();
+            items = data.items || (Array.isArray(data) ? data : []);
+            apiSuccess = true;
+            break;
         } catch (e) {
-            response = await fetch(proxy + encodeURIComponent(apiUrl));
+            console.warn('Token API attempt failed:', url, e.message);
         }
-
-        if (!response.ok) throw new Error("API Unreachable");
-
-        const data = await response.json();
-        const items = data.items || (Array.isArray(data) ? data : []);
-        let tokenResults = [];
-
-        for (const item of items) {
-            const t = item.token || item;
-            const val = item.value || item.balance;
-            const tokenAddr = t.address_hash || t.address;
-
-            if (tokenAddr && val && val !== "0") {
-                const decimals = parseInt(t.decimals || "18", 10);
-                const formatted = ethers.formatUnits(val, decimals);
-                
-                if (parseFloat(formatted) > 0) {
-                    tokenResults.push({
-                        addr: tokenAddr,
-                        symbol: t.symbol || '???',
-                        name: t.name || 'Unknown',
-                        decimals: decimals,
-                        balance: val,
-                        displayBal: parseFloat(formatted).toLocaleString('id-ID', { maximumFractionDigits: 4 })
-                    });
-                }
-            }
-        }
-
-        loading.style.display = 'none';
-        list.innerHTML = '';
-
-        if (tokenResults.length === 0) {
-            list.innerHTML = `
-                <div style="padding:20px;text-align:center;">
-                    <div style="font-size:.7rem;color:var(--text-ash);margin-bottom:10px;">No auto-detected tokens.</div>
-                    <button onclick="document.getElementById('tokenPickerWrap').style.display='none'" style="background:var(--fire-outer);color:#fff;border:none;padding:5px 10px;font-size:.6rem;cursor:pointer;border-radius:2px;">Enter Address Manually</button>
-                </div>`;
-            return;
-        }
-
-        tokenResults.sort((a, b) => a.symbol.localeCompare(b.symbol));
-
-        tokenResults.forEach(tk => {
-            const item = document.createElement('div');
-            item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);';
-            item.innerHTML = `
-                <div style="width:24px;height:24px;background:#331a00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;color:#ff9900;border:1px solid #552200;flex-shrink:0;">${tk.symbol.slice(0,2)}</div>
-                <div style="flex:1;min-width:0;text-align:left;">
-                    <div style="font-size:.7rem;color:#fff;font-weight:700;">${tk.symbol}</div>
-                    <div style="font-size:.5rem;color:#555;font-family:monospace;">${tk.addr.slice(0,10)}...</div>
-                </div>
-                <div style="text-align:right;flex-shrink:0;">
-                    <div style="font-size:.7rem;color:var(--fire-inner);font-family:'Share Tech Mono';">${tk.displayBal}</div>
-                </div>`;
-            item.onclick = () => selectToken(tk);
-            list.appendChild(item);
-        });
-
-    } catch (err) {
-        console.error('Fetch error:', err);
-        loading.style.display = 'none';
-        list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-ash);font-size:.6rem;">
-            Failed to sync with Explorer.<br>Please paste the token address manually.
-        </div>`;
     }
+
+    if (!apiSuccess) {
+        setError(currentLang === 'id'
+            ? '❌ Gagal terhubung ke Explorer. Coba lagi atau masukkan address token manual.'
+            : '❌ Failed to reach Explorer. Retry or enter token address manually.');
+        return;
+    }
+
+    let tokenResults = [];
+    for (const item of items) {
+        try {
+            const tk  = item.token || item;
+            const val = item.value || item.balance;
+            const tokenAddr = tk.address_hash || tk.address;
+            if (!tokenAddr || !val || val === '0') continue;
+
+            const decimals  = parseInt(tk.decimals || '18', 10);
+            const rawBigInt = BigInt(val);
+            const divisor   = 10n ** BigInt(decimals);
+            const wholeTokens = rawBigInt / divisor;
+            if (wholeTokens < 1n) continue;
+
+            const floatBal = parseFloat(ethers.formatUnits(val, decimals));
+            tokenResults.push({
+                addr:       tokenAddr,
+                symbol:     tk.symbol || '???',
+                name:       tk.name   || 'Unknown',
+                decimals,
+                balance:    val,
+                displayBal: floatBal.toLocaleString('id-ID', { maximumFractionDigits: 4 })
+            });
+        } catch(e) { continue; }
+    }
+
+    if (tokenResults.length === 0) {
+        setError(currentLang === 'id'
+            ? '⚠️ Tidak ada token ERC20 dengan saldo ≥ 1 yang terdeteksi.'
+            : '⚠️ No ERC20 tokens with balance ≥ 1 detected.');
+        return;
+    }
+
+    tokenResults.sort((a, b) => a.symbol.localeCompare(b.symbol));
+
+    setMsg('🔍 ' + (currentLang === 'id' ? 'Menyaring token berpajak...' : 'Filtering tax tokens...'));
+
+    const userAddr    = signer ? await signer.getAddress() : userAddress;
+    const cleanTokens = [];
+    for (const tk of tokenResults) {
+        try {
+            const tempContract = new ethers.Contract(tk.addr, ERC20_ABI, signer || provider);
+            const hasTax = await detectTransferTax(tempContract, userAddr, tk.decimals);
+            if (!hasTax) cleanTokens.push(tk);
+        } catch {
+            cleanTokens.push(tk); // include on detection failure; burn will re-check
+        }
+    }
+
+    if (cleanTokens.length === 0) {
+        setError(currentLang === 'id'
+            ? '⚠️ Semua token terdeteksi memiliki transfer tax dan tidak bisa dibakar.'
+            : '⚠️ All detected tokens have transfer tax and cannot be burned.');
+        return;
+    }
+
+    list.innerHTML = '';
+    cleanTokens.forEach(tk => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;';
+        item.onmouseenter = () => item.style.background = 'rgba(255,80,0,.06)';
+        item.onmouseleave = () => item.style.background = '';
+        item.innerHTML = `
+            <div style="width:24px;height:24px;background:#331a00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;color:#ff9900;border:1px solid #552200;flex-shrink:0;">${tk.symbol.slice(0,2)}</div>
+            <div style="flex:1;min-width:0;text-align:left;">
+                <div style="font-size:.7rem;color:#fff;font-weight:700;">${tk.symbol}</div>
+                <div style="font-size:.5rem;color:#555;font-family:monospace;">${tk.addr.slice(0,10)}...</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:.7rem;color:var(--fire-inner);font-family:'Share Tech Mono';">${tk.displayBal}</div>
+            </div>`;
+        item.onclick = () => selectToken(tk);
+        list.appendChild(item);
+    });
 }
 
 function selectToken(tk) {
@@ -1691,6 +1725,7 @@ async function connectWallet(walletKey) {
         updateBurnBtn();
         statusEl.innerText = onTarget ? t('status.connected') : t('status.wrongchain');
         fetchWalletTokens(addr);
+        refreshIBStockDisplay();
         const existingSession = loadSession();
         if (existingSession && existingSession.address === addr.toLowerCase()) {
             userSigned = true;
@@ -1836,6 +1871,242 @@ document.getElementById('signinBtn').addEventListener('click', async () => {
     }
 })();
 
+const MAX_BURN_AMOUNT   = 1_000_000;
+const BURN_COOLDOWN_MS  = 30_000;
+const LAST_BURN_KEY     = 'ib_last_burn';
+
+const TOKEN_BLACKLIST = new Set([
+    '0x0000000000000000000000000000000000000000',
+].map(a => a.toLowerCase()));
+
+async function detectHoneypot(tokenContract, userAddr, decimals) {
+    try {
+        const smallAmount = 10n ** BigInt(decimals);
+        const rawBalance  = BigInt(await tokenContract.balanceOf(userAddr));
+        if (rawBalance < smallAmount) return false;
+        const DEAD = '0x000000000000000000000000000000000000dEaD';
+        try {
+            await tokenContract.transfer.staticCall(DEAD, smallAmount);
+        } catch (err) {
+            const msg = (err?.reason || err?.message || '').toLowerCase();
+            if (msg.includes('not allowed') || msg.includes('forbidden') ||
+                msg.includes('locked') || msg.includes('blacklist') ||
+                msg.includes('cannot') || msg.includes('disabled') ||
+                msg.includes('paused') || msg.includes('trading')) return true;
+            if (!msg.includes('tax') && !msg.includes('fee') && !msg.includes('exceeds')) return true;
+        }
+        return false;
+    } catch (e) {
+        console.warn('Honeypot detection error:', e);
+        return false;
+    }
+}
+
+async function simulateBurnTx(tokenAddress, amountFormatted, userAddr) {
+    try {
+        const iface    = new ethers.Interface(BURNER_ABI);
+        const calldata = iface.encodeFunctionData('burnAndClaim', [tokenAddress, amountFormatted]);
+        await provider.call({ to: BURNER_CONTRACT_ADDRESS, from: userAddr, data: calldata });
+        return { ok: true, error: '' };
+    } catch (err) {
+        const msg = err?.reason || err?.shortMessage || err?.message || 'Unknown error';
+        return { ok: false, error: msg };
+    }
+}
+
+async function checkContractPaused() {
+    try {
+        const prov = provider || getPublicProvider();
+        const c    = new ethers.Contract(BURNER_CONTRACT_ADDRESS, [
+            'function paused() view returns (bool)'
+        ], prov);
+        return await c.paused();
+    } catch { return false; }
+}
+
+async function fetchIBTokenStock() {
+    try {
+        const prov = provider || getPublicProvider();
+        const ibC  = new ethers.Contract(IB_TOKEN_ADDR, [
+            'function balanceOf(address) view returns (uint256)',
+            'function decimals() view returns (uint8)'
+        ], prov);
+        const [bal, dec] = await Promise.all([
+            ibC.balanceOf(BURNER_CONTRACT_ADDRESS),
+            ibC.decimals()
+        ]);
+        return Number(ethers.formatUnits(bal, dec));
+    } catch { return null; }
+}
+
+async function refreshIBStockDisplay() {
+    const el = document.getElementById('ibStockDisplay');
+    if (!el) return;
+    const stock = await fetchIBTokenStock();
+    if (stock === null) { el.textContent = '?'; return; }
+    el.textContent = stock.toLocaleString();
+    el.style.color = stock < 10 ? '#ff3300' : stock < 100 ? '#ff9900' : 'var(--fire-inner)';
+}
+
+function showBurnConfirmModal({ tokenName, tokenSymbol, tokenAddress, amount, userAddr }) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.id = 'burnConfirmOverlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+        const isId = currentLang === 'id';
+        overlay.innerHTML = `
+        <div style="background:linear-gradient(160deg,#1a0800,#0f0502);border:1px solid var(--fire-outer);border-radius:10px;padding:28px 24px;max-width:380px;width:90%;font-family:'Share Tech Mono',monospace;box-shadow:0 0 40px rgba(255,80,0,.3);">
+            <div style="font-size:1.6rem;text-align:center;margin-bottom:4px;">🔥</div>
+            <div style="font-size:.9rem;color:var(--fire-inner);text-align:center;font-weight:700;margin-bottom:4px;">${isId ? 'Konfirmasi Burn' : 'Confirm Burn'}</div>
+            <div style="font-size:.55rem;color:var(--text-ash);text-align:center;margin-bottom:18px;letter-spacing:.08em;">// ${isId ? 'periksa detail sebelum lanjut' : 'review details before proceeding'} //</div>
+            <div style="background:rgba(255,80,0,.06);border:1px solid rgba(255,80,0,.15);border-radius:6px;padding:14px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:var(--text-ash);font-size:.6rem;">TOKEN</span>
+                    <span style="color:#fff;font-size:.65rem;font-weight:700;">${tokenName} (${tokenSymbol})</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:var(--text-ash);font-size:.6rem;">${isId ? 'ALAMAT' : 'ADDRESS'}</span>
+                    <span style="color:var(--fire-inner);font-size:.55rem;">${tokenAddress.slice(0,10)}...${tokenAddress.slice(-8)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:var(--text-ash);font-size:.6rem;">${isId ? 'JUMLAH DIBAKAR' : 'AMOUNT TO BURN'}</span>
+                    <span style="color:#ff3300;font-size:.65rem;font-weight:700;">${amount.toLocaleString()} ${tokenSymbol}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:var(--text-ash);font-size:.6rem;">${isId ? 'KAMU TERIMA' : 'YOU RECEIVE'}</span>
+                    <span style="color:#66ff99;font-size:.65rem;font-weight:700;">1 IB Token</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--text-ash);font-size:.6rem;">WALLET</span>
+                    <span style="color:#aaa;font-size:.55rem;">${userAddr.slice(0,6)}...${userAddr.slice(-4)}</span>
+                </div>
+            </div>
+            <div style="background:rgba(255,50,0,.08);border:1px solid rgba(255,50,0,.2);border-radius:4px;padding:10px;margin-bottom:16px;font-size:.58rem;color:#ff9966;line-height:1.5;">
+                ⚠️ ${isId ? 'Token yang sudah dibakar <strong style="color:#ff3300">TIDAK BISA dikembalikan</strong>. Pastikan kamu sudah memeriksa alamat token dengan benar.' : 'Burned tokens <strong style="color:#ff3300">CANNOT be recovered</strong>. Make sure you have verified the token address carefully.'}
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button id="burnConfirmCancel" style="flex:1;padding:10px;background:rgba(255,255,255,.05);border:1px solid #333;color:#aaa;font-family:'Share Tech Mono',monospace;font-size:.65rem;cursor:pointer;border-radius:4px;">✕ ${isId ? 'Batalkan' : 'Cancel'}</button>
+                <button id="burnConfirmOk" disabled style="flex:2;padding:10px;background:linear-gradient(90deg,#cc1a00,#ff5500);border:none;color:#fff;font-family:'Share Tech Mono',monospace;font-size:.65rem;cursor:not-allowed;border-radius:4px;font-weight:700;opacity:.5;transition:all .3s;">🔥 ${isId ? 'Ya, Bakar (5...)' : 'Yes, Burn (5...)'}</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        let countdown = 5;
+        const okBtn   = overlay.querySelector('#burnConfirmOk');
+        const timer   = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                clearInterval(timer);
+                okBtn.disabled = false;
+                okBtn.style.cursor  = 'pointer';
+                okBtn.style.opacity = '1';
+                okBtn.textContent   = `🔥 ${isId ? 'Ya, Bakar Sekarang' : 'Yes, Burn Now'}`;
+            } else {
+                okBtn.textContent = `🔥 ${isId ? `Ya, Bakar (${countdown}...)` : `Yes, Burn (${countdown}...)`}`;
+            }
+        }, 1000);
+        overlay.querySelector('#burnConfirmCancel').onclick = () => { clearInterval(timer); overlay.remove(); resolve(false); };
+        okBtn.onclick = () => { if (okBtn.disabled) return; overlay.remove(); resolve(true); };
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) { clearInterval(timer); overlay.remove(); resolve(false); } });
+    });
+}
+
+// ─── AUTO-FETCH TOKEN INFO ────────────────────────────────────────────────────
+let tokenInfoCache = {};
+async function autoFetchTokenInfo(address) {
+    if (!address || !ethers.isAddress(address)) return null;
+    const key = address.toLowerCase();
+    if (tokenInfoCache[key]) return tokenInfoCache[key];
+    try {
+        const prov = provider || getPublicProvider();
+        if (!prov) return null;
+        const c    = new ethers.Contract(address, ERC20_ABI, prov);
+        const [name, symbol, decimals] = await Promise.all([
+            c.name().catch(() => 'Unknown'),
+            c.symbol().catch(() => '???'),
+            c.decimals().catch(() => 18)
+        ]);
+        const info = { name, symbol, decimals: Number(decimals) };
+        tokenInfoCache[key] = info;
+        return info;
+    } catch { return null; }
+}
+
+(function setupTokenAddrAutoFetch() {
+    const inp   = document.getElementById('tokenAddr');
+    const badge = document.getElementById('tokenInfoBadge');
+    if (!inp) return;
+    let debounce;
+    inp.addEventListener('input', () => {
+        badge.style.display = 'none';
+        clearTimeout(debounce);
+        const val = inp.value.trim();
+        if (!ethers.isAddress(val)) return;
+        try {
+            const checksummed = ethers.getAddress(val);
+            if (val !== checksummed && val !== checksummed.toLowerCase()) {
+                badge.innerHTML = '⚠️ Checksum mismatch';
+                badge.style.display = 'block';
+                return;
+            }
+        } catch { return; }
+        debounce = setTimeout(async () => {
+            badge.innerHTML = '⏳';
+            badge.style.display = 'block';
+            const info = await autoFetchTokenInfo(val);
+            if (!info) { badge.innerHTML = '❓ Unknown token'; return; }
+            const avatarSVG = createTokenAvatarSVG(info.symbol);
+            badge.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;overflow:hidden;display:inline-flex;">${avatarSVG}</span>${info.name} · ${info.symbol}</span>`;
+        }, 600);
+    });
+})();
+
+async function detectTransferTax(tokenContract, userAddr, decimals) {
+    try {
+        const smallAmount = 10n ** BigInt(decimals); // 1 token unit
+        const rawBalance = BigInt(await tokenContract.balanceOf(userAddr));
+        if (rawBalance < smallAmount) return false; // can't test with tiny balance, assume clean
+
+        // Use staticCall to simulate transfer to self without spending gas
+        // If the received amount would be less than sent, there's a tax
+        const balBefore = BigInt(await tokenContract.balanceOf(userAddr));
+        
+        // Try to detect via callStatic — simulate transfer of 1 token to self
+        try {
+            await tokenContract.transfer.staticCall(userAddr, smallAmount);
+        } catch (err) {
+            const msg = (err?.reason || err?.message || '').toLowerCase();
+            // If revert mentions tax, fee, or amount mismatch → has tax
+            if (msg.includes('tax') || msg.includes('fee') || msg.includes('exceeds') || msg.includes('deflationary')) {
+                return true;
+            }
+        }
+
+        try {
+            const iface = tokenContract.interface;
+            const calldata = iface.encodeFunctionData('transfer', [userAddr, smallAmount]);
+            const result = await tokenContract.runner.provider.call({
+                to: await tokenContract.getAddress(),
+                from: userAddr,
+                data: calldata
+            });
+            // Decode return bool — if it returns false silently, something is wrong
+            if (result === '0x' || result === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+                return true;
+            }
+        } catch (e) {
+            const msg = (e?.reason || e?.message || '').toLowerCase();
+            if (msg.includes('tax') || msg.includes('fee') || msg.includes('exceeds') || msg.includes('deflationary')) {
+                return true;
+            }
+        }
+
+        return false;
+    } catch (e) {
+        console.warn('Tax detection error:', e);
+        return false;
+    }
+}
+
 async function doBurn() {
     if (burnBtn.getAttribute('data-locked') === 'true') {
         statusEl.innerText = t('status.signinRequired');
@@ -1846,71 +2117,127 @@ async function doBurn() {
     }
     if (!userSigned)       { statusEl.innerText = t('status.signinRequired'); return; }
     if (!tosCheck.checked) { statusEl.innerText = t('status.notos');          return; }
- 
+
     const tokenAddress = document.getElementById('tokenAddr').value.trim();
     const amountStr    = document.getElementById('amount').value.trim();
- 
+
     if (!tokenAddress)                   { statusEl.innerText = t('status.notoken');  return; }
     if (!ethers.isAddress(tokenAddress)) { statusEl.innerText = t('status.badaddr');  return; }
- 
+
+    if (TOKEN_BLACKLIST.has(tokenAddress.toLowerCase())) {
+        statusEl.innerText = currentLang === 'id'
+            ? '[ ❌ Token ini ada dalam daftar blokir. ]'
+            : '[ ❌ This token is on the blocklist. ]';
+        return;
+    }
+
+    if (tokenAddress.toLowerCase() === IB_TOKEN_ADDR.toLowerCase()) {
+        statusEl.innerText = currentLang === 'id'
+            ? '[ ❌ Kamu tidak bisa membakar IB Token itu sendiri! ]'
+            : '[ ❌ You cannot burn the IB Token itself! ]';
+        return;
+    }
+
     const amountNum = parseFloat(amountStr);
     if (!amountStr || isNaN(amountNum) || amountNum < 1 || !Number.isInteger(amountNum)) {
         statusEl.innerText = t('status.badamount');
         return;
     }
- 
+
+    if (amountNum > MAX_BURN_AMOUNT) {
+        statusEl.innerText = currentLang === 'id'
+            ? `[ ❌ Jumlah maksimal burn adalah ${MAX_BURN_AMOUNT.toLocaleString()} token per transaksi. ]`
+            : `[ ❌ Maximum burn is ${MAX_BURN_AMOUNT.toLocaleString()} tokens per transaction. ]`;
+        return;
+    }
+
+    const lastBurn = parseInt(localStorage.getItem(LAST_BURN_KEY) || '0', 10);
+    const elapsed  = Date.now() - lastBurn;
+    if (elapsed < BURN_COOLDOWN_MS) {
+        const remaining = Math.ceil((BURN_COOLDOWN_MS - elapsed) / 1000);
+        statusEl.innerText = currentLang === 'id'
+            ? `[ ⏳ Tunggu ${remaining} detik sebelum burn lagi. ]`
+            : `[ ⏳ Please wait ${remaining}s before burning again. ]`;
+        return;
+    }
+
     try {
         burnBtn.disabled = true;
         if (!signer) { statusEl.innerText = t('status.nosigner'); return; }
- 
+
+        statusEl.innerText = currentLang === 'id'
+            ? '[ 🔄 Memeriksa status kontrak... ]'
+            : '[ 🔄 Checking contract status... ]';
+        const isPaused = await checkContractPaused();
+        if (isPaused) {
+            statusEl.innerText = currentLang === 'id'
+                ? '[ ⏸️ Kontrak sedang dijeda oleh admin. Coba lagi nanti. ]'
+                : '[ ⏸️ Contract is paused by admin. Please try again later. ]';
+            return;
+        }
+
         const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
- 
+
         statusEl.innerText = t('status.checkdec');
         let decimals;
         try { decimals = await tokenContract.decimals(); } catch { decimals = 18; }
- 
+
         const userAddr   = await signer.getAddress();
         const rawBalance = BigInt(await tokenContract.balanceOf(userAddr));
         const divisor    = 10n ** BigInt(decimals);
         const maxWhole   = rawBalance / divisor;
         const requested  = BigInt(amountNum);
- 
+
         if (requested > maxWhole) {
             statusEl.innerText = currentLang === 'id'
                 ? `[ ❌ Saldo tidak cukup. Saldo on-chain kamu: ${maxWhole.toString()} token ]`
                 : `[ ❌ Insufficient balance. Your on-chain balance: ${maxWhole.toString()} whole token(s) ]`;
             return;
         }
- 
+
         const amountFormatted = requested * divisor;
+
         statusEl.innerText = currentLang === 'id'
-            ? '[ 🔍 Mendeteksi pajak token... ]'
-            : '[ 🔍 Detecting token tax... ]';
- 
-        let minReceive = 0n;
-        let taxWarning = '';
- 
+            ? '[ 🔍 Memeriksa pajak transfer token... ]'
+            : '[ 🔍 Checking token transfer tax... ]';
+        const hasTax = await detectTransferTax(tokenContract, userAddr, decimals);
+        if (hasTax) {
+            statusEl.innerText = currentLang === 'id'
+                ? '[ ❌ Token ini memiliki pajak transfer. Tidak diizinkan untuk dibakar. ]'
+                : '[ ❌ This token has a transfer tax and cannot be burned. ]';
+            return;
+        }
+
+        // ── Cek honeypot ────────────────────────────────────────────────────
+        statusEl.innerText = currentLang === 'id'
+            ? '[ 🔍 Memeriksa potensi honeypot... ]'
+            : '[ 🔍 Checking for honeypot... ]';
+        const isHoneypot = await detectHoneypot(tokenContract, userAddr, decimals);
+        if (isHoneypot) {
+            statusEl.innerText = currentLang === 'id'
+                ? '[ ❌ Token ini terdeteksi sebagai honeypot! Transfer tidak bisa dilakukan. ]'
+                : '[ ❌ Token detected as honeypot! Transfer is not possible. ]';
+            return;
+        }
+
+        let tokenName   = 'Unknown Token';
+        let tokenSymbol = '???';
         try {
-            const sim = await burnerContract.simulateBurn(tokenAddress, amountFormatted);
-            const estimatedReceived = BigInt(sim[0]);
-            const taxBps            = BigInt(sim[1]);
- 
-            if (taxBps > 0n) {
-                const taxPct = Number(taxBps) / 100;
-                taxWarning = currentLang === 'id'
-                    ? `⚠️ Token ini memiliki pajak ~${taxPct}%. Kamu burn ${amountNum}, yang terbakar ~${ethers.formatUnits(estimatedReceived, decimals)} token.`
-                    : `⚠️ Token has ~${taxPct}% tax. You send ${amountNum}, ~${ethers.formatUnits(estimatedReceived, decimals)} will actually burn.`;
-                minReceive = estimatedReceived * 90n / 100n;
-            }
-        } catch (simErr) {
-            console.warn('simulateBurn not available, proceeding without tax check:', simErr);
+            tokenName   = await tokenContract.name();
+            tokenSymbol = await tokenContract.symbol();
+        } catch {}
+
+        statusEl.innerText = currentLang === 'id'
+            ? '[ ⏳ Menunggu konfirmasi dari kamu... ]'
+            : '[ ⏳ Waiting for your confirmation... ]';
+        const confirmed = await showBurnConfirmModal({
+            tokenName, tokenSymbol, tokenAddress, amount: amountNum, userAddr
+        });
+        if (!confirmed) {
+            statusEl.innerText = t('status.txcancel');
+            return;
         }
- 
-        if (taxWarning) {
-            statusEl.innerText = `[ ${taxWarning} ]`;
-            await new Promise(r => setTimeout(r, 2500));
-        }
- 
+
         statusEl.innerText = t('status.checkallow');
         const currentAllowance = await tokenContract.allowance(userAddr, BURNER_CONTRACT_ADDRESS);
         if (BigInt(currentAllowance) < BigInt(amountFormatted)) {
@@ -1920,38 +2247,32 @@ async function doBurn() {
             await appTx.wait();
             statusEl.innerText = t('status.approved');
         }
- 
+
         statusEl.innerText = t('status.burning');
-        let burnTx;
-        if (minReceive > 0n) {
-            burnTx = await burnerContract.burnAndClaimWithMinReceive(
-                tokenAddress,
-                amountFormatted,
-                minReceive
-            );
-        } else {
-            burnTx = await burnerContract.burnAndClaim(tokenAddress, amountFormatted);
-        }
- 
+        const burnTx = await burnerContract.burnAndClaim(tokenAddress, amountFormatted);
+
         statusEl.innerText = t('status.waitburn');
-        await burnTx.wait();
-        statusEl.innerText = t('status.success');
- 
+        const receipt = await burnTx.wait();
+
+        localStorage.setItem(LAST_BURN_KEY, Date.now().toString());
+
+        const txHash = receipt?.hash || burnTx?.hash || '';
+        const explorerLink = txHash
+            ? ` <a href="https://basescan.org/tx/${txHash}" target="_blank" rel="noopener" style="color:var(--fire-inner);text-decoration:underline;">View Tx ↗</a>`
+            : '';
+        statusEl.innerHTML = t('status.success') + explorerLink;
+
     } catch (err) {
         console.error(err);
         const msg = err?.reason || err?.shortMessage || err?.message || '';
         if (msg.includes('bad result data') || msg.includes('could not decode')) {
             statusEl.innerText = t('status.notERC20');
-        } else if (msg.includes('less than minReceive') || msg.includes('tax too high')) {
-            statusEl.innerText = currentLang === 'id'
-                ? '[ ❌ Token pajak terlalu tinggi. Coba jumlah lebih kecil. ]'
-                : '[ ❌ Token tax too high. Try a smaller amount. ]';
         } else if (err?.code === 4001 || err?.code === 'ACTION_REJECTED') {
             statusEl.innerText = t('status.txcancel');
         } else if (msg.includes('transfer amount exceeds balance')) {
             statusEl.innerText = currentLang === 'id'
-                ? '[ ❌ Token ini memiliki pajak transfer.]'
-                : '[ ❌ This token has transfer tax.]';
+                ? '[ ❌ Token ini memiliki pajak transfer. ]'
+                : '[ ❌ This token has transfer tax. ]';
         } else {
             statusEl.innerText = `[ ❌ Error: ${msg || 'Transaction Failed'} ]`;
         }
@@ -2086,10 +2407,18 @@ function spawnBurstEmbers(count = 12) {
     const origDoBurn = doBurn;
     burnBtn.onclick = async function(...args) {
         await origDoBurn.call(this, ...args);
-        setTimeout(() => {
-            if (statusEl.innerText.includes('🎉') || statusEl.innerText.includes('Success') || statusEl.innerText.includes('Berhasil')) {
+        setTimeout(async () => {
+            if (statusEl.innerHTML.includes('🎉') || statusEl.innerHTML.includes('Success') || statusEl.innerHTML.includes('Berhasil')) {
                 spawnBurstEmbers(20);
                 doRefresh();
+                if (signer) {
+                    try {
+                        const addr = await signer.getAddress();
+                        await fetchWalletTokens(addr);
+                    } catch(e) {
+                        console.warn('Token picker refresh after burn failed:', e);
+                    }
+                }
             }
         }, 500);
     };
