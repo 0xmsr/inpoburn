@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InpoBurn Hub</title>
+    <title>Inpoburn Hub | Burn & Claim IB Token</title>
     <meta name="description" content="Burn any ERC20 token and claim 1 IB token instantly.">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="inpohub.css">
@@ -43,6 +43,11 @@
         <button class="nav-link" onclick="openInfoModal('tos')" data-i18n="nav.tos">ToS</button>
         <button class="nav-link" onclick="openInfoModal('faq')" data-i18n="nav.faq">FAQ</button>
         <button class="nav-link" onclick="openInfoModal('risk')" data-i18n="nav.risk">Risks</button>
+    </div>
+    <div class="nav-actions">
+        <span id="streakBadge" class="streak-badge" style="display:none;"></span>
+        <button id="notifBtn" class="nav-icon-btn" title="Enable Burn Notifications" style="display:none;">🔔</button>
+        <button id="themeToggle" class="nav-icon-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
     </div>
 </nav>
 
@@ -387,9 +392,61 @@
 
             <button id="burnBtn" class="btn-primary" disabled data-i18n="card.burnBtn">🔥 Approve &amp; Burn</button>
 
+            <div id="gasEstimateRow" class="gas-estimate-row" style="display:none;">
+                <span style="color:var(--text-ash);font-size:.55rem;letter-spacing:.05em;">⛽ EST. GAS</span>
+                <span id="gasEstimateValue" style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--fire-inner);"></span>
+            </div>
+
+            <button id="shareAfterBurn" class="btn-share" style="display:none;">
+                𝕏 Share on X
+            </button>
+
             <div id="status" data-i18n="card.statusWaiting">[ Waiting for wallet connection... ]</div>
         </div>
 
+    </div>
+
+    <!-- ═══ STATS & HISTORY SECTION ═══ -->
+    <div id="statsHistorySection" class="stats-history-section" style="display:none;">
+        <div class="shs-inner">
+
+            <!-- Wallet Stats -->
+            <div id="walletStatsPanel" class="feature-panel" style="display:none;">
+                <div class="feature-panel-title">📊 My Stats</div>
+                <div class="wallet-stats-grid">
+                    <div class="ws-item"><span class="ws-val" id="statTotalBurns">0</span><span class="ws-label">Total Burns</span></div>
+                    <div class="ws-item"><span class="ws-val" id="statTotalIB">0</span><span class="ws-label">IB Claimed</span></div>
+                    <div class="ws-item"><span class="ws-val" id="statStreak">—</span><span class="ws-label">Streak</span></div>
+                    <div class="ws-item"><span class="ws-val" id="statBadges">0/8</span><span class="ws-label">Badges</span></div>
+                    <div class="ws-item"><span class="ws-val" id="statTokens">0</span><span class="ws-label">Unique Tokens</span></div>
+                </div>
+            </div>
+
+            <div class="shs-cols">
+                <!-- Burn History -->
+                <div class="feature-panel">
+                    <div class="feature-panel-title">🕓 Burn History
+                        <button onclick="if(confirm('Clear all history?')){{localStorage.removeItem('ib_burn_history_v1');renderBurnHistory();renderTopTokens();renderWalletStats();}}" class="panel-clear-btn">✕ Clear</button>
+                    </div>
+                    <div id="burnSparkline" style="margin-bottom:8px;opacity:.8;"></div>
+                    <div id="burnHistoryList" class="panel-scroll"></div>
+                </div>
+
+                <div class="shs-right-col">
+                    <!-- Top Tokens -->
+                    <div class="feature-panel">
+                        <div class="feature-panel-title">🏆 Top Burned</div>
+                        <div id="topTokensList" style="padding:4px 0;"></div>
+                    </div>
+
+                    <!-- Badges -->
+                    <div class="feature-panel">
+                        <div class="feature-panel-title">🎖️ Achievements</div>
+                        <div id="badgesList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px 0;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="site-footer">
@@ -455,5 +512,6 @@
 
 </div>
 <script src="inpohub.js"></script>
+<script src="translate-id-en.js"></script>
 </body>
 </html>
