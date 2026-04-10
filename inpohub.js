@@ -1,340 +1,4 @@
-const TRANSLATIONS = {
-  en: {
-    'nav.how': 'How It Works',
-    'nav.tos': 'ToS',
-    'nav.faq': 'FAQ',
-    'nav.risk': 'Risks',
-    'wallet.sub': '// choose your wallet //',
-    'wallet.detecting': 'Detecting...',
-    'wallet.detected': 'Detected ✔',
-    'wallet.notFound': 'Not Detected',
-    'hero.badge': '🔴 Live on Blockchain',
-    'hero.sub': '// burn any erc20 token → claim 1 IB token instantly //',
-    'stats.tokens': 'All Tokens Supported',
-    'stats.ratio': 'Burn → IB Ratio',
-    'stats.standard': 'Standard',
-    'sidebar.guide': 'Quick Guide',
-    'sidebar.step1': 'Connect your wallet to a supported network (auto-switch)',
-    'sidebar.step2': 'Enter the ERC20 token address to burn',
-    'sidebar.step3': 'Set the amount (min. 1 whole token)',
-    'sidebar.step4': 'Approve & Burn — receive 1 IB token!',
-    'sidebar.copy': 'Click to copy',
-    'sidebar.explorer': 'View on Explorer ↗',
-    'card.title': 'Burn & Claim',
-    'card.tagline': '// approve → burn → receive 1 IB //',
-    'card.connect': '⚡ Connect Wallet',
-    'card.tokenLabel': 'Token Address to Burn',
-    'card.pickerHint': '📂 SELECT FROM WALLET — or type manually below',
-    'card.pickerLoading': '⏳ Loading tokens...',
-    'card.tokenPlaceholder': '0x123... (or select from list above)',
-    'card.amountLabel': 'Amount (Min 1 Token, Integer Only)',
-    'card.tosAgree': 'I have read and agree to the',
-    'card.tosTos': 'Terms of Service',
-    'card.tosRisk': 'Risk Disclaimer',
-    'card.burnBtn': '🔥 Approve & Burn',
-    'card.statusWaiting': '[ Waiting for wallet connection... ]',
-    'modal.how.title': 'How It Works',
-    'modal.how.sub': '// burn & claim mechanism //',
-    'modal.how.p1': 'Inpoburn Hub allows anyone to burn any ERC20 token on a supported blockchain network and receive 1 IB (Inpoburn) token in return.',
-    'modal.how.steps': 'Steps',
-    'modal.how.s1': '1. Connect your wallet to a supported network.',
-    'modal.how.s2': '2. Enter the ERC20 token address you want to burn.',
-    'modal.how.s3': '3. Set the amount (min. 1 whole token).',
-    'modal.how.s4': '4. Click Approve & Burn — wallet will prompt two transactions: approve and burn.',
-    'modal.how.s5': '5. After blockchain confirmation, 1 IB token is sent to your wallet automatically.',
-    'modal.how.sc': 'Smart Contract',
-    'modal.how.scp': 'The burn process is fully on-chain through the UniversalBurner contract. Burned tokens are sent to the dead address (0x000...dEaD) and cannot be recovered.',
-    'modal.tos.title': 'Terms of Service',
-    'modal.tos.sub': '// terms & conditions of use //',
-    'modal.tos.h1': '1. Acceptance of Terms',
-    'modal.tos.p1': 'By using Inpoburn Hub, you agree to all applicable terms and conditions. If you disagree, please stop using this service.',
-    'modal.tos.h2': '2. Nature of Service',
-    'modal.tos.p2': 'Inpoburn Hub is an experimental dApp running on supported blockchain networks. This service is provided "as is" without any warranty.',
-    'modal.tos.h3': '3. User Risk',
-    'modal.tos.p3': 'You are solely responsible for every transaction made. Burned tokens cannot be returned under any circumstance.',
-    'modal.tos.h4': '4. Limitation of Liability',
-    'modal.tos.p4': 'The Inpoburn team is not responsible for asset loss, transaction failure, or any damage arising from use of this platform.',
-    'modal.tos.h5': '5. Prohibited Uses',
-    'modal.tos.l1': 'Using the platform for illegal purposes',
-    'modal.tos.l2': 'Attempting to exploit the smart contract',
-    'modal.tos.l3': 'Spreading false information about the platform',
-    'modal.tos.h6': '6. Service Changes',
-    'modal.tos.p6': 'We reserve the right to modify, suspend, or terminate the service at any time without prior notice.',
-    'modal.tos.h7': '7. Governing Law',
-    'modal.tos.p7': 'These terms are governed by generally applicable international contract law principles.',
-    'modal.faq.title': 'FAQ',
-    'modal.faq.sub': '// frequently asked questions //',
-    'modal.faq.q1': 'What tokens can be burned?',
-    'modal.faq.a1': 'Any valid ERC20 token on the supported network. Make sure you have enough tokens and ETH for gas fees.',
-    'modal.faq.q2': 'What is the minimum burn amount?',
-    'modal.faq.a2': 'Minimum 1 whole token (integer). Decimal values like 0.5 or 0.9 are not accepted.',
-    'modal.faq.q3': 'Can I receive more than 1 IB?',
-    'modal.faq.a3': 'Each burn transaction yields exactly 1 IB token, regardless of how many tokens you burn.',
-    'modal.faq.q4': 'Which networks are supported?',
-    'modal.faq.a4': 'Inpoburn Hub supports major blockchain networks. The platform will show available network options when you connect your wallet.',
-    'modal.faq.q5': 'Are there platform fees?',
-    'modal.faq.a5': 'No platform fees. You only pay the gas fee of the blockchain network you are using.',
-    'modal.faq.q6': 'What network does Inpoburn use?',
-    'modal.faq.a6': 'Inpoburn Hub runs on Base Mainnet (Chain ID 8453). Make sure your wallet is connected to Base and you have ETH on Base for gas fees.',
-    'modal.faq.q7': 'Why did my transaction fail?',
-    'modal.faq.a7': 'Possible causes: invalid token, insufficient balance, or a congested network. Check your transaction on the block explorer.',
-    'modal.risk.title': 'Risk Disclaimer',
-    'modal.risk.sub': '// important risk information //',
-    'modal.risk.h1': 'Irreversibility Risk',
-    'modal.risk.p1': 'Blockchain transactions are permanent and cannot be reversed. Once tokens are burned, the process cannot be undone under any circumstance.',
-    'modal.risk.h2': 'Smart Contract Risk',
-    'modal.risk.p2': 'Although the contract has been tested, all smart contracts carry potential bugs. Use only amounts you are prepared to lose.',
-    'modal.risk.h3': 'Network Risk',
-    'modal.risk.p3': 'Network congestion can cause transactions to be delayed or fail. Gas fees can fluctuate significantly.',
-    'modal.risk.h4': 'Token Risk',
-    'modal.risk.p4': 'Always verify the token address before burning. Fake tokens or tokens with special mechanics (fee-on-transfer, rebase) may not work correctly.',
-    'modal.risk.h5': 'Live Mainnet Platform',
-    'modal.risk.p5': 'Inpoburn runs on Base Mainnet. IB tokens claimed are live on-chain and carry real network value. All transactions are final.',
-    'modal.risk.h6': 'Important Advice',
-    'modal.risk.l1': 'Always verify the contract address before transacting',
-    'modal.risk.l2': 'Never burn tokens that have important value to you',
-    'modal.risk.l3': 'Make sure you are connected to the correct network',
-    'modal.risk.l4': 'Use the minimum amount for your first attempt',
-    'footer.desc': 'Experimental burn-to-claim ERC20 token platform on blockchain. Not financial advice. Use wisely.',
-    'footer.platform': 'Platform',
-    'footer.legal': 'Legal',
-    'footer.community': 'Community',
-    'footer.faucet': 'Bridge to Base ↗',
-    'footer.copy': '© 2025 Inpoburn Hub · All rights reserved',
-    'lang.label': '🌐 Language',
-    'status.waiting':     '[ Waiting for wallet connection... ]',
-    'status.connecting':  '[ ⏳ Connecting wallet... ]',
-    'status.checknet':    '[ 🔄 Checking network... ]',
-    'status.addnet':      '[ ➕ Adding network to wallet... ]',
-    'status.wrongnet':    '[ ⚠️ Wrong network, transactions may fail! ]',
-    'status.connected':   '[ ✅ Connected to Base. Check ToS to start! ]',
-    'status.wrongchain':  '[ ⚠️ Connected, but wrong network. Please switch manually. ]',
-    'status.rejected':    '[ ❌ Connection rejected by user. ]',
-    'status.failconn':    '[ ❌ Failed to connect wallet. ]',
-    'status.notoken':     '[ ❌ Token address cannot be empty! ]',
-    'status.badaddr':     '[ ❌ Invalid token address! ]',
-    'status.badamount':   '[ ❌ Amount must be a whole number ≥ 1 (e.g. 1, 2, 10) ]',
-    'status.notERC20':    '[ ❌ Not a valid ERC20 token on this network. ]',
-    'status.txcancel':    '[ ❌ Transaction cancelled by user. ]',
-    'status.notos':       '[ ❌ Please check ToS & Risk Disclaimer first! ]',
-    'status.nosigner':    '[ ❌ Signer unavailable! ]',
-    'status.checkdec':    '[ 🔍 Checking token decimals... ]',
-    'status.checkallow':  '[ 🔓 Checking allowance... ]',
-    'status.approving':   "[ ✍️ Click 'Approve' in your wallet... ]",
-    'status.waitapprove': '[ ⏳ Waiting for approve confirmation... ]',
-    'status.approved':    '[ ✅ Approval granted! ]',
-    'status.burning':     '[ 🔥 Burning & Claiming... ]',
-    'status.waitburn':    '[ ⏳ Waiting for blockchain confirmation... ]',
-    'status.success':     '[ 🎉 Success! 1 IB has been sent to your wallet. ]',
-    'status.selected':    (name, sym, bal) => `[ 🎯 Token selected: ${name} (${sym}) — balance: ${bal} ]`,
-    'status.copied':      '✅ Copied!',
-    'status.signinRequired': '[ 🔐 Sign the message in your wallet to unlock burn! ]',
-    'status.signedIn':    '[ ✅ Verified! Wallet confirmed — ready to burn. ]',
-    'status.signSkipped': '[ 🔒 Burn locked. Sign message to verify you\'re human. ]',
-    'picker.detecting': '⏳ Detecting ERC20 tokens in wallet...',
-    'picker.scanning':  (from, to, i, max) => `🔍 Scanning block ${from}–${to} (${i}/${max})...`,
-    'picker.checking':  (n) => `🔎 Checking ${n} token contracts...`,
-    'picker.none':      (n) => `⚠️ No ERC20 tokens detected in last ~${n} blocks.`,
-    'picker.empty':     '⚠️ No ERC20 tokens with balance > 0 found.',
-    'picker.error':     '❌ Failed to load tokens. Type address manually.',
-    'wallet.install':   (key) => `${key} not detected.\nOpen installation page?`,
-    'wallet.nowallet':  '[ ❌ No wallet detected. ]',
-	'footer.community': 'Community',
-    'footer.coffee': '☕ Buy Me a Coffee (Base/ETH)',
-    'footer.copyMsg': 'Address Copied! Thanks for the coffee! ☕',
-  },
-  id: {
-    'nav.how': 'Cara Kerja',
-    'nav.tos': 'ToS',
-    'nav.faq': 'FAQ',
-    'nav.risk': 'Risiko',
-    'wallet.sub': '// pilih dompet kamu //',
-    'wallet.detecting': 'Mendeteksi...',
-    'wallet.detected': 'Terdeteksi ✔',
-    'wallet.notFound': 'Tidak Terdeteksi',
-    'hero.sub': '// bakar token erc20 apapun → klaim 1 IB token seketika //',
-    'stats.tokens': 'Token Didukung',
-    'stats.ratio': 'Rasio Burn → IB',
-    'stats.standard': 'Standar',
-    'sidebar.guide': 'Panduan Cepat',
-    'sidebar.step1': 'Hubungkan wallet ke jaringan yang didukung (auto-switch)',
-    'sidebar.step2': 'Masukkan alamat token ERC20 yang ingin dibakar',
-    'sidebar.step3': 'Tentukan jumlah (min. 1 token bulat)',
-    'sidebar.step4': 'Approve & Burn — terima 1 IB token!',
-    'sidebar.copy': 'Klik untuk copy',
-    'sidebar.explorer': 'Lihat di Explorer ↗',
-    'card.title': 'Burn & Klaim',
-    'card.tagline': '// approve → bakar → terima 1 IB //',
-    'card.connect': '⚡ Hubungkan Wallet',
-    'card.tokenLabel': 'Alamat Token yang Akan Dibakar',
-    'card.pickerHint': '📂 PILIH DARI WALLET — atau ketik manual di bawah',
-    'card.pickerLoading': '⏳ Memuat token...',
-    'card.tokenPlaceholder': '0x123... (atau pilih dari daftar atas)',
-    'card.amountLabel': 'Jumlah (Min 1 Token, Bilangan Bulat)',
-    'card.tosAgree': 'Saya telah membaca dan menyetujui',
-    'card.tosTos': 'Syarat & Ketentuan',
-    'card.tosRisk': 'Disclaimer Risiko',
-    'card.burnBtn': '🔥 Setujui & Bakar',
-    'card.statusWaiting': '[ Menunggu koneksi wallet... ]',
-    'modal.how.title': 'Cara Kerja',
-    'modal.how.sub': '// mekanisme burn & claim //',
-    'modal.how.p1': 'Inpoburn Hub memungkinkan siapa saja untuk membakar token ERC20 apapun di jaringan blockchain yang didukung dan menerima 1 IB (Inpoburn) token sebagai gantinya.',
-    'modal.how.steps': 'Langkah-langkah',
-    'modal.how.s1': '1. Hubungkan wallet kamu ke jaringan yang didukung.',
-    'modal.how.s2': '2. Masukkan alamat token ERC20 yang ingin dibakar.',
-    'modal.how.s3': '3. Tentukan jumlah token (min. 1 token bulat).',
-    'modal.how.s4': '4. Klik Approve & Burn — wallet akan meminta dua transaksi: approve dan burn.',
-    'modal.how.s5': '5. Setelah konfirmasi blockchain, 1 IB token masuk ke wallet kamu secara otomatis.',
-    'modal.how.sc': 'Smart Contract',
-    'modal.how.scp': 'Proses burn dilakukan sepenuhnya on-chain melalui kontrak UniversalBurner. Token yang dibakar dikirim ke alamat dead (0x000...dEaD) dan tidak dapat dikembalikan.',
-    'modal.tos.title': 'Syarat & Ketentuan',
-    'modal.tos.sub': '// syarat & ketentuan penggunaan //',
-    'modal.tos.h1': '1. Penerimaan Syarat',
-    'modal.tos.p1': 'Dengan menggunakan Inpoburn Hub, kamu menyetujui seluruh syarat dan ketentuan yang berlaku. Jika tidak setuju, harap hentikan penggunaan layanan ini.',
-    'modal.tos.h2': '2. Sifat Layanan',
-    'modal.tos.p2': 'Inpoburn Hub adalah dApp eksperimental yang berjalan di jaringan blockchain yang didukung. Layanan ini disediakan "sebagaimana adanya" tanpa jaminan apapun.',
-    'modal.tos.h3': '3. Risiko Pengguna',
-    'modal.tos.p3': 'Kamu sepenuhnya bertanggung jawab atas setiap transaksi yang dilakukan. Token yang sudah dibakar tidak dapat dikembalikan dalam kondisi apapun.',
-    'modal.tos.h4': '4. Batasan Tanggung Jawab',
-    'modal.tos.p4': 'Tim Inpoburn tidak bertanggung jawab atas kehilangan aset, kegagalan transaksi, atau kerugian apapun yang timbul dari penggunaan platform ini.',
-    'modal.tos.h5': '5. Penggunaan yang Dilarang',
-    'modal.tos.l1': 'Menggunakan platform untuk tujuan ilegal',
-    'modal.tos.l2': 'Mencoba mengeksploitasi smart contract',
-    'modal.tos.l3': 'Menyebarkan informasi palsu tentang platform',
-    'modal.tos.h6': '6. Perubahan Layanan',
-    'modal.tos.p6': 'Kami berhak mengubah, menangguhkan, atau menghentikan layanan kapan saja tanpa pemberitahuan sebelumnya.',
-    'modal.tos.h7': '7. Hukum yang Berlaku',
-    'modal.tos.p7': 'Syarat ini diatur oleh prinsip-prinsip umum hukum kontrak yang berlaku secara internasional.',
-    'modal.faq.title': 'FAQ',
-    'modal.faq.sub': '// pertanyaan yang sering diajukan //',
-    'modal.faq.q1': 'Token apa yang bisa dibakar?',
-    'modal.faq.a1': 'Semua token ERC20 yang valid di jaringan yang didukung. Pastikan kamu memiliki cukup token dan ETH untuk gas fee.',
-    'modal.faq.q2': 'Berapa minimal token yang bisa dibakar?',
-    'modal.faq.a2': 'Minimal 1 token bulat (integer). Nilai desimal seperti 0.5 atau 0.9 tidak diterima.',
-    'modal.faq.q3': 'Apakah saya bisa mendapat lebih dari 1 IB?',
-    'modal.faq.a3': 'Setiap transaksi burn menghasilkan tepat 1 IB token, tidak peduli berapa banyak token yang kamu bakar.',
-    'modal.faq.q4': 'Network apa yang didukung?',
-    'modal.faq.a4': 'Inpoburn Hub mendukung jaringan blockchain utama. Platform akan menampilkan pilihan network yang tersedia saat kamu menghubungkan wallet.',
-    'modal.faq.q5': 'Apakah ada biaya platform?',
-    'modal.faq.a5': 'Tidak ada biaya platform. Kamu hanya membayar gas fee jaringan blockchain yang sedang kamu gunakan.',
-    'modal.faq.q6': 'Network apa yang digunakan Inpoburn?',
-    'modal.faq.a6': 'Inpoburn Hub berjalan di Base Mainnet (Chain ID 8453). Pastikan wallet kamu terhubung ke Base dan memiliki ETH di Base untuk membayar gas fee.',
-    'modal.faq.q7': 'Transaksi saya gagal, kenapa?',
-    'modal.faq.a7': 'Kemungkinan penyebab: token tidak valid, saldo tidak cukup, atau jaringan sedang sibuk. Cek status transaksi di block explorer.',
-    'modal.risk.title': 'Disclaimer Risiko',
-    'modal.risk.sub': '// informasi risiko penting //',
-    'modal.risk.h1': 'Risiko Irreversibilitas',
-    'modal.risk.p1': 'Transaksi blockchain bersifat permanen dan tidak dapat dibatalkan. Setelah token dibakar, proses tidak bisa diurungkan dalam kondisi apapun.',
-    'modal.risk.h2': 'Risiko Smart Contract',
-    'modal.risk.p2': 'Meskipun kontrak telah diuji, semua smart contract mengandung potensi bug. Gunakan dengan jumlah yang kamu siap kehilangan.',
-    'modal.risk.h3': 'Risiko Jaringan',
-    'modal.risk.p3': 'Kongestis jaringan dapat menyebabkan transaksi tertunda atau gagal. Gas fee dapat berfluktuasi secara signifikan.',
-    'modal.risk.h4': 'Risiko Token',
-    'modal.risk.p4': 'Pastikan kamu memverifikasi alamat token sebelum burn. Token palsu atau token dengan mekanisme khusus (fee-on-transfer, rebase) mungkin tidak bekerja dengan benar.',
-    'modal.risk.h5': 'Platform Mainnet Live',
-    'modal.risk.p5': 'Inpoburn berjalan di Base Mainnet. Token IB yang diklaim bersifat on-chain nyata. Seluruh transaksi bersifat final.',
-    'modal.risk.h6': 'Saran Penting',
-    'modal.risk.l1': 'Selalu verifikasi alamat kontrak sebelum bertransaksi',
-    'modal.risk.l2': 'Jangan pernah burn token yang memiliki nilai penting bagimu',
-    'modal.risk.l3': 'Pastikan kamu terhubung ke network yang benar',
-    'modal.risk.l4': 'Gunakan jumlah minimal untuk percobaan pertama',
-    'footer.desc': 'Platform burn-to-claim ERC20 token eksperimental di blockchain. Bukan financial advice. Gunakan dengan bijak.',
-    'footer.platform': 'Platform',
-    'footer.legal': 'Legal',
-    'footer.community': 'Komunitas',
-    'footer.faucet': 'Bridge to Base ↗',
-    'footer.copy': '© 2025 Inpoburn Hub · Hak cipta dilindungi',
-    'lang.label': '🌐 Bahasa',
-    'status.waiting':     '[ Menunggu koneksi wallet... ]',
-    'status.connecting':  '[ ⏳ Menghubungkan wallet... ]',
-    'status.checknet':    '[ 🔄 Mengecek network... ]',
-    'status.addnet':      '[ ➕ Menambahkan network ke wallet... ]',
-    'status.wrongnet':    '[ ⚠️ Network tidak sesuai, transaksi mungkin gagal! ]',
-    'status.connected':   '[ ✅ Terhubung ke Base. Centang ToS untuk mulai! ]',
-    'status.wrongchain':  '[ ⚠️ Terhubung, tapi network tidak sesuai. Harap ganti manual. ]',
-    'status.rejected':    '[ ❌ Koneksi ditolak oleh pengguna. ]',
-    'status.failconn':    '[ ❌ Gagal menghubungkan wallet. ]',
-    'status.notoken':     '[ ❌ Token address tidak boleh kosong! ]',
-    'status.badaddr':     '[ ❌ Alamat Token tidak valid! ]',
-    'status.badamount':   '[ ❌ Jumlah harus bilangan bulat minimal 1 (contoh: 1, 2, 10) ]',
-    'status.notERC20':    '[ ❌ Bukan token ERC20 valid di network ini. ]',
-    'status.txcancel':    '[ ❌ Transaksi dibatalkan oleh pengguna. ]',
-    'status.notos':       '[ ❌ Harap centang ToS & Risk Disclaimer terlebih dahulu! ]',
-    'status.nosigner':    '[ ❌ Signer tidak tersedia! ]',
-    'status.checkdec':    '[ 🔍 Mengecek desimal token... ]',
-    'status.checkallow':  '[ 🔓 Mengecek izin (allowance)... ]',
-    'status.approving':   "[ ✍️ Klik 'Approve' di wallet kamu... ]",
-    'status.waitapprove': '[ ⏳ Menunggu konfirmasi approve... ]',
-    'status.approved':    '[ ✅ Izin diberikan! ]',
-    'status.burning':     '[ 🔥 Proses Burn & Claim... ]',
-    'status.waitburn':    '[ ⏳ Menunggu konfirmasi blockchain... ]',
-    'status.success':     '[ 🎉 Berhasil! 1 IB telah masuk ke dompet Anda. ]',
-    'status.selected':    (name, sym, bal) => `[ 🎯 Token dipilih: ${name} (${sym}) — saldo: ${bal} ]`,
-    'status.copied':      '✅ Tersalin!',
-    'status.signinRequired': '[ 🔐 Tanda tangani pesan di wallet kamu untuk membuka burn! ]',
-    'status.signedIn':    '[ ✅ Terverifikasi! Wallet dikonfirmasi — siap burn. ]',
-    'status.signSkipped': '[ 🔒 Burn terkunci. Tanda tangani pesan untuk membuktikan kamu bukan bot. ]',
-    'picker.detecting': '⏳ Mendeteksi token ERC20 di wallet...',
-    'picker.scanning':  (from, to, i, max) => `🔍 Scan block ${from}–${to} (${i}/${max})...`,
-    'picker.checking':  (n) => `🔎 Memeriksa ${n} token kontrak...`,
-    'picker.none':      (n) => `⚠️ Tidak ada token ERC20 terdeteksi dalam ~${n} block terakhir.`,
-    'picker.empty':     '⚠️ Tidak ada token ERC20 dengan saldo > 0 ditemukan.',
-    'picker.error':     '❌ Gagal memuat daftar token. Ketik address manual.',
-    'wallet.install':   (key) => `${key} tidak terdeteksi.\nBuka halaman instalasi?`,
-    'wallet.nowallet':  '[ ❌ Tidak ada wallet terdeteksi. ]',
-	'footer.community': 'Komunitas',
-    'footer.coffee': '☕ Traktir Saya Kopi (Base/ETH)',
-    'footer.copyMsg': 'Alamat Disalin! Terima kasih kopinya! ☕',
-  }
-};
 
-let currentLang = localStorage.getItem('ib_lang') || 'en';
-
-function t(key, ...args) {
-  const val = TRANSLATIONS[currentLang][key] || TRANSLATIONS['en'][key];
-  if (typeof val === 'function') return val(...args);
-  return val || key;
-}
-
-function applyLang() {
-  document.documentElement.lang = currentLang;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const val = t(key);
-    if (typeof val === 'string') el.textContent = val;
-  });
-
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
-  });
-
-  document.querySelectorAll('[data-i18n-title]').forEach(el => {
-    el.title = t(el.getAttribute('data-i18n-title'));
-  });
-
-  document.getElementById('langEN').classList.toggle('active', currentLang === 'en');
-  document.getElementById('langID').classList.toggle('active', currentLang === 'id');
-
-  ['metamask','trust','coinbase','browser'].forEach(key => {
-    const span = document.getElementById('status-' + key);
-    if (!span) return;
-    if (span.textContent.includes('✔') || span.textContent.includes('Terdeteksi') || span.textContent.includes('Detected')) {
-      span.textContent = t('wallet.detected');
-    } else if (span.textContent !== t('wallet.detecting')) {
-      span.textContent = t('wallet.notFound');
-    } else {
-      span.textContent = t('wallet.detecting');
-    }
-  });
-}
-
-function setLang(lang) {
-  currentLang = lang;
-  localStorage.setItem('ib_lang', lang);
-  applyLang();
-}
-
-applyLang();
 
 const BURNER_CONTRACT_ADDRESS = "0xB5E17d760192Dd896e49022BcC491D167085D61D";
 
@@ -1588,7 +1252,7 @@ async function fetchWalletTokens(userAddress) {
 
     tokenResults.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
-    setMsg('🔍 ' + (currentLang === 'id' ? 'Menyaring token berpajak...' : 'Filtering tax tokens...'));
+    setMsg('🔍 ' + (currentLang === 'id' ? 'Menyaring token bertax...' : 'Filtering tax tokens...'));
 
     const userAddr    = signer ? await signer.getAddress() : userAddress;
     const cleanTokens = [];
@@ -1598,7 +1262,7 @@ async function fetchWalletTokens(userAddress) {
             const hasTax = await detectTransferTax(tempContract, userAddr, tk.decimals);
             if (!hasTax) cleanTokens.push(tk);
         } catch {
-            cleanTokens.push(tk); // include on detection failure; burn will re-check
+            cleanTokens.push(tk);
         }
     }
 
@@ -1610,8 +1274,17 @@ async function fetchWalletTokens(userAddress) {
     }
 
     list.innerHTML = '';
+
+    const searchWrap = document.createElement('div');
+    searchWrap.style.cssText = 'padding:6px 10px;border-bottom:1px solid rgba(255,80,0,.1);position:sticky;top:0;background:var(--card-bg);z-index:2;';
+    searchWrap.innerHTML = `<input id="tokenPickerSearch" type="text" placeholder="🔍 Search token..." autocomplete="off" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border-dim);border-radius:4px;padding:5px 8px;font-size:.6rem;color:#fff;font-family:'Share Tech Mono',monospace;outline:none;">`;
+    list.appendChild(searchWrap);
+
     cleanTokens.forEach(tk => {
         const item = document.createElement('div');
+        item.setAttribute('data-token-item', '1');
+        item.setAttribute('data-sym', tk.symbol);
+        item.setAttribute('data-addr', tk.addr);
         item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;';
         item.onmouseenter = () => item.style.background = 'rgba(255,80,0,.06)';
         item.onmouseleave = () => item.style.background = '';
@@ -1627,6 +1300,18 @@ async function fetchWalletTokens(userAddress) {
         item.onclick = () => selectToken(tk);
         list.appendChild(item);
     });
+
+    const searchInput = document.getElementById('tokenPickerSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase();
+            list.querySelectorAll('[data-token-item]').forEach(el => {
+                const sym  = (el.dataset.sym  || '').toLowerCase();
+                const addr = (el.dataset.addr || '').toLowerCase();
+                el.style.display = (!q || sym.includes(q) || addr.includes(q)) ? '' : 'none';
+            });
+        });
+    }
 }
 
 function selectToken(tk) {
@@ -1726,6 +1411,12 @@ async function connectWallet(walletKey) {
         statusEl.innerText = onTarget ? t('status.connected') : t('status.wrongchain');
         fetchWalletTokens(addr);
         refreshIBStockDisplay();
+        maybeRequestNotifPermission();
+        setTimeout(() => {
+            renderBurnHistory(); renderTopTokens(); renderWalletStats(); renderBadgesPanel(); renderStreakBadge();
+            const _ss = document.getElementById('statsHistorySection');
+            if (_ss && loadBurnHistory().length > 0) _ss.style.display = 'block';
+        }, 200);
         const existingSession = loadSession();
         if (existingSession && existingSession.address === addr.toLowerCase()) {
             userSigned = true;
@@ -1872,7 +1563,7 @@ document.getElementById('signinBtn').addEventListener('click', async () => {
 })();
 
 const MAX_BURN_AMOUNT   = 1_000_000;
-const BURN_COOLDOWN_MS  = 30_000;
+const BURN_COOLDOWN_MS  = 3_000;
 const LAST_BURN_KEY     = 'ib_last_burn';
 
 const TOKEN_BLACKLIST = new Set([
@@ -2010,7 +1701,6 @@ function showBurnConfirmModal({ tokenName, tokenSymbol, tokenAddress, amount, us
     });
 }
 
-// ─── AUTO-FETCH TOKEN INFO ────────────────────────────────────────────────────
 let tokenInfoCache = {};
 async function autoFetchTokenInfo(address) {
     if (!address || !ethers.isAddress(address)) return null;
@@ -2064,18 +1754,13 @@ async function detectTransferTax(tokenContract, userAddr, decimals) {
     try {
         const smallAmount = 10n ** BigInt(decimals); // 1 token unit
         const rawBalance = BigInt(await tokenContract.balanceOf(userAddr));
-        if (rawBalance < smallAmount) return false; // can't test with tiny balance, assume clean
-
-        // Use staticCall to simulate transfer to self without spending gas
-        // If the received amount would be less than sent, there's a tax
+        if (rawBalance < smallAmount) return false; 
         const balBefore = BigInt(await tokenContract.balanceOf(userAddr));
         
-        // Try to detect via callStatic — simulate transfer of 1 token to self
         try {
             await tokenContract.transfer.staticCall(userAddr, smallAmount);
         } catch (err) {
             const msg = (err?.reason || err?.message || '').toLowerCase();
-            // If revert mentions tax, fee, or amount mismatch → has tax
             if (msg.includes('tax') || msg.includes('fee') || msg.includes('exceeds') || msg.includes('deflationary')) {
                 return true;
             }
@@ -2089,7 +1774,6 @@ async function detectTransferTax(tokenContract, userAddr, decimals) {
                 from: userAddr,
                 data: calldata
             });
-            // Decode return bool — if it returns false silently, something is wrong
             if (result === '0x' || result === '0x0000000000000000000000000000000000000000000000000000000000000000') {
                 return true;
             }
@@ -2208,7 +1892,6 @@ async function doBurn() {
             return;
         }
 
-        // ── Cek honeypot ────────────────────────────────────────────────────
         statusEl.innerText = currentLang === 'id'
             ? '[ 🔍 Memeriksa potensi honeypot... ]'
             : '[ 🔍 Checking for honeypot... ]';
@@ -2220,6 +1903,27 @@ async function doBurn() {
             return;
         }
 
+        if (isCommunityBlacklisted(tokenAddress)) {
+            const isId = currentLang === 'id';
+            if (!confirm(isId
+                ? '⚠️ Token ini ada di daftar blokir lokalmu.\nLanjutkan dengan risiko sendiri?'
+                : '⚠️ This token is in your local blocklist.\nProceed at your own risk?')) {
+                statusEl.innerText = t('status.txcancel'); return;
+            }
+        }
+
+        statusEl.innerText = currentLang === 'id' ? '[ 🔍 Memeriksa umur kontrak token... ]' : '[ 🔍 Checking token contract age... ]';
+        const ageDays = await fetchContractAgeDays(tokenAddress);
+        if (ageDays !== null && ageDays < 30) {
+            const isId = currentLang === 'id';
+            if (!confirm(isId
+                ? `⚠️ Kontrak token ini baru berumur ${ageDays} hari!\nToken baru berisiko tinggi (rug pull, scam, dll).\nTetap lanjutkan?`
+                : `⚠️ This token contract is only ${ageDays} day(s) old!\nNew tokens carry high risk (rug pull, scam, etc).\nProceed anyway?`)) {
+                statusEl.innerText = t('status.txcancel'); return;
+            }
+        }
+
+        const isFirstBurnToken = !loadBurnHistory().some(h => h.tokenAddr?.toLowerCase() === tokenAddress.toLowerCase());
         let tokenName   = 'Unknown Token';
         let tokenSymbol = '???';
         try {
@@ -2231,7 +1935,7 @@ async function doBurn() {
             ? '[ ⏳ Menunggu konfirmasi dari kamu... ]'
             : '[ ⏳ Waiting for your confirmation... ]';
         const confirmed = await showBurnConfirmModal({
-            tokenName, tokenSymbol, tokenAddress, amount: amountNum, userAddr
+            tokenName, tokenSymbol, tokenAddress, amount: amountNum, userAddr, isFirstBurnToken
         });
         if (!confirmed) {
             statusEl.innerText = t('status.txcancel');
@@ -2255,12 +1959,20 @@ async function doBurn() {
         const receipt = await burnTx.wait();
 
         localStorage.setItem(LAST_BURN_KEY, Date.now().toString());
-
         const txHash = receipt?.hash || burnTx?.hash || '';
         const explorerLink = txHash
             ? ` <a href="https://basescan.org/tx/${txHash}" target="_blank" rel="noopener" style="color:var(--fire-inner);text-decoration:underline;">View Tx ↗</a>`
             : '';
         statusEl.innerHTML = t('status.success') + explorerLink;
+
+        saveBurnToHistory({ tokenSymbol, tokenName, tokenAddr: tokenAddress, amount: amountNum, txHash, timestamp: Date.now() });
+        const _burnStreak = updateBurnStreak();
+        checkAndGrantBadges(loadBurnHistory().length, _burnStreak);
+        sendBurnNotif(tokenSymbol, txHash);
+        showShareButton(tokenSymbol, amountNum, txHash);
+        renderBurnHistory(); renderTopTokens(); renderWalletStats(); renderBadgesPanel(); renderStreakBadge();
+        const _ss = document.getElementById('statsHistorySection');
+        if (_ss) _ss.style.display = 'block';
 
     } catch (err) {
         console.error(err);
@@ -2446,7 +2158,7 @@ function disconnectWallet() {
     document.getElementById('tokenInfoBadge').style.display = 'none';
     document.getElementById('tokenPickerWrap').style.display = 'none';
 
-    clearSession(); // Clear Session (Anti-Bot)
+    clearSession();
     updateBurnBtn();
 }
 
@@ -2464,8 +2176,23 @@ if (window.ethereum) {
         }
     });
 
-    window.ethereum.on('chainChanged', () => {
-        window.location.reload();
+    window.ethereum.on('chainChanged', (chainId) => {
+        const onBase = parseInt(chainId, 16) === 8453;
+        if (onBase) {
+            if (walletConnected) {
+                const rp = window.ethereum;
+                provider = new ethers.BrowserProvider(rp);
+                provider.getSigner().then(s => {
+                    signer = s;
+                    burnerContract = new ethers.Contract(BURNER_CONTRACT_ADDRESS, BURNER_ABI, signer);
+                    statusEl.innerText = t('status.connected');
+                    const modal = document.getElementById('wrongNetworkModal');
+                    if (modal) modal.remove();
+                }).catch(() => window.location.reload());
+            }
+        } else {
+            if (walletConnected) showWrongNetworkModal();
+        }
     });
 }
 
@@ -2528,4 +2255,492 @@ function copyCoffeeAddress() {
     navigator.clipboard.writeText(addr);
     const msg = TRANSLATIONS[currentLang]['footer.copyMsg'];
     alert(msg);
+}
+
+(function initTheme() {
+    const saved = localStorage.getItem('ib_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
+
+function toggleTheme() {
+    const cur  = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('ib_theme', next);
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+const HISTORY_KEY = 'ib_burn_history_v1';
+
+function loadBurnHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+    catch { return []; }
+}
+
+function saveBurnToHistory(entry) {
+    const hist = loadBurnHistory();
+    hist.unshift(entry);
+    if (hist.length > 100) hist.splice(100);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+}
+
+function renderBurnHistory() {
+    const container = document.getElementById('burnHistoryList');
+    const chartEl   = document.getElementById('burnSparkline');
+    if (!container) return;
+    const hist = loadBurnHistory();
+
+    if (chartEl) {
+        const days   = 14;
+        const counts = Array(days).fill(0);
+        const now    = Date.now();
+        hist.forEach(h => {
+            const d = Math.floor((now - h.timestamp) / 86400000);
+            if (d < days) counts[days - 1 - d]++;
+        });
+        const max   = Math.max(...counts, 1);
+        const W = 280, H = 48;
+        const step  = W / days;
+        let pts = '', area = '';
+        counts.forEach((c, i) => {
+            const x = i * step + step / 2;
+            const y = H - (c / max) * (H - 6) - 3;
+            pts  += (i === 0 ? `M${x},${y}` : ` L${x},${y}`);
+        });
+        area = `${pts} L${W},${H} L0,${H} Z`;
+        chartEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;">
+            <defs><linearGradient id="spkG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff5500" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#ff5500" stop-opacity="0"/>
+            </linearGradient></defs>
+            <path d="${area}" fill="url(#spkG)"/>
+            <path d="${pts}" fill="none" stroke="#ff5500" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+    }
+
+    if (hist.length === 0) {
+        container.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-ash);font-size:.65rem;">No burn history yet. Start burning! 🔥</div>`;
+        return;
+    }
+    container.innerHTML = hist.slice(0, 20).map(h => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(255,80,0,.07);">
+            <div style="width:28px;height:28px;background:#331a00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;color:#ff9900;border:1px solid #552200;flex-shrink:0;">${(h.tokenSymbol||'?').slice(0,2)}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:.65rem;color:#fff;font-weight:700;">${h.tokenSymbol||'?'} <span style="color:#555;font-weight:400;">×${h.amount}</span></div>
+                <div style="font-size:.5rem;color:#555;">${new Date(h.timestamp).toLocaleString()}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <span style="font-size:.6rem;color:#66ff99;font-weight:700;">+1 IB</span>
+                ${h.txHash ? `<a href="https://basescan.org/tx/${h.txHash}" target="_blank" rel="noopener" style="font-size:.55rem;color:var(--fire-inner);text-decoration:none;border:1px solid #331a00;padding:1px 5px;border-radius:3px;">TX ↗</a>` : ''}
+                <button onclick="reportFromHistory('${h.tokenAddr||''}','${h.tokenSymbol||'?'}')" title="Report token" style="background:none;border:none;color:#555;font-size:.6rem;cursor:pointer;padding:1px 4px;">⚑</button>
+            </div>
+        </div>`).join('');
+}
+
+function reportFromHistory(addr, sym) {
+    if (!addr) return;
+    if (confirm(`Report ${sym} (${addr.slice(0,10)}...) as scam/blacklist?\nThis only affects your local list.`)) {
+        reportAndBlacklistToken(addr, sym);
+    }
+}
+
+function renderTopTokens() {
+    const el = document.getElementById('topTokensList');
+    if (!el) return;
+    const hist = loadBurnHistory();
+    if (!hist.length) {
+        el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-ash);font-size:.6rem;">No data yet.</div>';
+        return;
+    }
+    const counts = {};
+    hist.forEach(h => { const k = h.tokenSymbol || '?'; counts[k] = (counts[k]||0)+1; });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    el.innerHTML = sorted.map(([sym,cnt],i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="color:var(--fire-inner);font-size:.58rem;width:14px;text-align:center;">#${i+1}</span>
+            <span style="color:#fff;font-size:.65rem;font-weight:700;flex:1;">${sym}</span>
+            <span style="color:var(--text-ash);font-size:.58rem;">${cnt}× burn</span>
+        </div>`).join('');
+}
+
+function renderWalletStats() {
+    const el = document.getElementById('walletStatsPanel');
+    if (!el || !walletConnected) return;
+    const hist       = loadBurnHistory();
+    const streak     = getStreak();
+    const badgesEarned = loadBadges().length;
+    const uniqTokens = new Set(hist.map(h => h.tokenAddr || h.tokenSymbol)).size;
+    el.style.display = 'block';
+    const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    set('statTotalBurns', hist.length);
+    set('statTotalIB',    hist.length);
+    set('statStreak',     streak > 0 ? streak + '🔥' : '—');
+    set('statBadges',     `${badgesEarned}/${BADGE_DEFS.length}`);
+    set('statTokens',     uniqTokens);
+}
+
+const BADGES_KEY = 'ib_badges_v1';
+const BADGE_DEFS = [
+    { id:'first_burn', icon:'🔥', name:'First Burn',    desc:'Complete your first burn',      req:1   },
+    { id:'burn_5',     icon:'💥', name:'5× Burner',     desc:'Complete 5 burns',               req:5   },
+    { id:'burn_10',    icon:'⚡', name:'10× Burner',    desc:'Complete 10 burns',              req:10  },
+    { id:'burn_25',    icon:'🏅', name:'Burn Addict',   desc:'Complete 25 burns',              req:25  },
+    { id:'burn_50',    icon:'🌋', name:'Inferno',       desc:'Complete 50 burns',              req:50  },
+    { id:'burn_100',   icon:'👑', name:'Legendary',     desc:'Complete 100 burns',             req:100 },
+    { id:'streak_3',   icon:'🗓️', name:'3-Day Streak',  desc:'Burn 3 days in a row',          streakReq:3  },
+    { id:'streak_7',   icon:'📅', name:'Weekly Grind',  desc:'Burn 7 days in a row',          streakReq:7  },
+];
+
+function loadBadges() {
+    try { return JSON.parse(localStorage.getItem(BADGES_KEY) || '[]'); }
+    catch { return []; }
+}
+
+function checkAndGrantBadges(totalBurns, currentStreak) {
+    const earned    = new Set(loadBadges());
+    const newEarned = [];
+    for (const b of BADGE_DEFS) {
+        if (earned.has(b.id)) continue;
+        if (b.req       && totalBurns    >= b.req)       { earned.add(b.id); newEarned.push(b); }
+        if (b.streakReq && currentStreak >= b.streakReq) { earned.add(b.id); newEarned.push(b); }
+    }
+    if (newEarned.length) {
+        localStorage.setItem(BADGES_KEY, JSON.stringify([...earned]));
+        newEarned.forEach(b => showBadgeToast(b));
+    }
+    renderBadgesPanel();
+}
+
+function showBadgeToast(badge) {
+    const toast = document.createElement('div');
+    toast.className = 'badge-toast';
+    toast.innerHTML = `
+        <div style="font-size:1.6rem;margin-bottom:2px;">${badge.icon}</div>
+        <div style="font-size:.6rem;color:var(--fire-inner);letter-spacing:.1em;margin-bottom:2px;">ACHIEVEMENT UNLOCKED</div>
+        <div style="font-size:.75rem;color:#fff;font-weight:700;">${badge.name}</div>
+        <div style="font-size:.55rem;color:var(--text-ash);margin-top:2px;">${badge.desc}</div>`;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 4500);
+}
+
+function renderBadgesPanel() {
+    const el = document.getElementById('badgesList');
+    if (!el) return;
+    const earned = new Set(loadBadges());
+    el.innerHTML = BADGE_DEFS.map(b => `
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;
+             background:${earned.has(b.id) ? 'rgba(255,80,0,.1)' : 'rgba(255,255,255,.02)'};
+             border:1px solid ${earned.has(b.id) ? 'rgba(255,80,0,.25)' : 'rgba(255,255,255,.04)'};
+             opacity:${earned.has(b.id) ? 1 : 0.4};">
+            <span style="font-size:1rem;">${b.icon}</span>
+            <div style="flex:1;">
+                <div style="font-size:.58rem;color:${earned.has(b.id)?'#fff':'#666'};font-weight:700;">${b.name}</div>
+                <div style="font-size:.48rem;color:var(--text-ash);">${b.desc}</div>
+            </div>
+            <span style="font-size:.6rem;">${earned.has(b.id) ? '✅' : '🔒'}</span>
+        </div>`).join('');
+}
+
+const STREAK_KEY = 'ib_streak_v1';
+
+function updateBurnStreak() {
+    const today     = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let data;
+    try { data = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}'); } catch { data = {}; }
+    if (data.lastDay === today) return data.streak || 1;
+    data.streak  = (data.lastDay === yesterday) ? (data.streak||1)+1 : 1;
+    data.lastDay = today;
+    localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+    return data.streak;
+}
+
+function getStreak() {
+    try {
+        const data      = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}');
+        const today     = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        return (data.lastDay === today || data.lastDay === yesterday) ? (data.streak||0) : 0;
+    } catch { return 0; }
+}
+
+function renderStreakBadge() {
+    const el = document.getElementById('streakBadge');
+    if (!el) return;
+    const s = getStreak();
+    el.textContent  = s > 0 ? `🔥 ${s}d` : '';
+    el.style.display = s > 0 ? 'inline-block' : 'none';
+}
+
+async function maybeRequestNotifPermission() {
+    if (!('Notification' in window) || Notification.permission !== 'default') return;
+    const btn = document.getElementById('notifBtn');
+    if (btn) { btn.style.display = 'flex'; }
+}
+
+async function requestBrowserNotif() {
+    if (!('Notification' in window)) return;
+    const perm = await Notification.requestPermission();
+    const btn  = document.getElementById('notifBtn');
+    if (btn)   btn.style.display = perm === 'default' ? 'flex' : 'none';
+    if (perm === 'granted') {
+        new Notification('🔥 Inpoburn Hub', { body: 'Notifications enabled! You\'ll be notified on burn success.' });
+    }
+}
+
+function sendBurnNotif(tokenSymbol, txHash) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const n = new Notification('🔥 Burn Confirmed!', {
+        body: `${tokenSymbol} burned → 1 IB received!`,
+        tag:  'inpoburn-success',
+    });
+    if (txHash) n.onclick = () => window.open(`https://basescan.org/tx/${txHash}`, '_blank');
+}
+
+function shareToX(tokenSymbol, amount, txHash) {
+    const text = `🔥 Just burned ${amount} $${tokenSymbol} and claimed 1 $IB on Inpoburn Hub!\n\nTx: https://basescan.org/tx/${txHash}\n\n#InpoburnHub #DeFi #Base #ERC20`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function showShareButton(tokenSymbol, amount, txHash) {
+    const el = document.getElementById('shareAfterBurn');
+    if (!el) return;
+    el.style.display  = 'flex';
+    el.dataset.sym    = tokenSymbol;
+    el.dataset.amount = amount;
+    el.dataset.tx     = txHash;
+}
+
+const COMMUNITY_BLACKLIST_KEY = 'ib_community_bl_v1';
+
+function loadCommunityBlacklist() {
+    try { return new Set(JSON.parse(localStorage.getItem(COMMUNITY_BLACKLIST_KEY) || '[]')); }
+    catch { return new Set(); }
+}
+
+function reportAndBlacklistToken(addr, sym) {
+    if (!addr) return;
+    const bl = loadCommunityBlacklist();
+    bl.add(addr.toLowerCase());
+    localStorage.setItem(COMMUNITY_BLACKLIST_KEY, JSON.stringify([...bl]));
+    alert(`✅ ${sym || addr.slice(0,10)} reported & added to your local blocklist.`);
+}
+
+function isCommunityBlacklisted(addr) {
+    return addr ? loadCommunityBlacklist().has(addr.toLowerCase()) : false;
+}
+
+async function fetchContractAgeDays(tokenAddr) {
+    try {
+        const res = await fetch(`https://base.blockscout.com/api/v2/addresses/${tokenAddr}`, { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const ts   = data.creation_transaction?.timestamp || data.created_at;
+        if (!ts) return null;
+        return Math.floor((Date.now() - new Date(ts).getTime()) / 86400000);
+    } catch { return null; }
+}
+
+let _gasDebounce = null;
+function scheduleGasEstimate() {
+    clearTimeout(_gasDebounce);
+    _gasDebounce = setTimeout(updateGasEstimate, 900);
+}
+
+async function updateGasEstimate() {
+    const gasEl  = document.getElementById('gasEstimateRow');
+    const gasVal = document.getElementById('gasEstimateValue');
+    if (!gasEl || !gasVal) return;
+    if (!walletConnected || !signer || !provider || !burnerContract) { gasEl.style.display = 'none'; return; }
+
+    const tokenAddress = document.getElementById('tokenAddr').value.trim();
+    const amountStr    = document.getElementById('amount').value.trim();
+    const amountNum    = parseInt(amountStr, 10);
+    if (!tokenAddress || !ethers.isAddress(tokenAddress) || !amountStr || isNaN(amountNum) || amountNum < 1) {
+        gasEl.style.display = 'none'; return;
+    }
+
+    gasEl.style.display   = 'flex';
+    gasVal.textContent    = '⏳ estimating...';
+    gasVal.style.color    = 'var(--text-ash)';
+
+    try {
+        const tokenContract   = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+        let decimals;
+        try { decimals = Number(await tokenContract.decimals()); } catch { decimals = 18; }
+        const amountFormatted = BigInt(amountNum) * (10n ** BigInt(decimals));
+
+        const [approveGas, burnGas, feeData] = await Promise.all([
+            tokenContract.approve.estimateGas(BURNER_CONTRACT_ADDRESS, amountFormatted).catch(() => 65000n),
+            burnerContract.burnAndClaim.estimateGas(tokenAddress, amountFormatted).catch(() => 130000n),
+            provider.getFeeData(),
+        ]);
+        const totalGas = approveGas + burnGas;
+        const gp       = feeData.gasPrice || feeData.maxFeePerGas;
+        const totalEth = gp ? parseFloat(ethers.formatEther(gp * totalGas)).toFixed(6) : '?';
+        const gpGwei   = gp ? parseFloat(ethers.formatUnits(gp, 'gwei')).toFixed(3) : '?';
+        gasVal.textContent = `~${totalEth} ETH  (${gpGwei} gwei · ${Number(totalGas).toLocaleString()} gas)`;
+        gasVal.style.color = 'var(--fire-inner)';
+    } catch { gasEl.style.display = 'none'; }
+}
+
+['tokenAddr','amount'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', scheduleGasEstimate);
+});
+
+function showQRModal(address, label) {
+    const old = document.getElementById('qrModalOverlay');
+    if (old) old.remove();
+    const overlay = document.createElement('div');
+    overlay.id    = 'qrModalOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=ff9900&bgcolor=0f0502&margin=10&data=${encodeURIComponent(address)}`;
+    overlay.innerHTML = `
+        <div style="background:linear-gradient(160deg,#1a0800,#0f0502);border:1px solid var(--fire-outer);border-radius:10px;padding:28px 24px;text-align:center;max-width:280px;width:90%;">
+            <div style="font-size:.58rem;color:var(--fire-inner);letter-spacing:.1em;margin-bottom:12px;text-transform:uppercase;">${label}</div>
+            <img src="${qrUrl}" style="border-radius:8px;width:180px;height:180px;background:#0f0502;" loading="lazy" alt="QR">
+            <div style="font-size:.5rem;color:#555;font-family:monospace;margin-top:10px;word-break:break-all;line-height:1.5;">${address}</div>
+            <button onclick="document.getElementById('qrModalOverlay').remove()" style="margin-top:16px;background:var(--fire-outer);color:#fff;border:none;padding:7px 20px;font-size:.65rem;cursor:pointer;border-radius:4px;font-family:inherit;">✕ Close</button>
+        </div>`;
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
+}
+
+document.querySelectorAll('.contract-addr').forEach(el => {
+    const addr = el.textContent.trim();
+    if (!ethers.isAddress(addr)) return;
+    const btn = document.createElement('button');
+    btn.textContent   = '⬜ QR';
+    btn.title         = 'Show QR Code';
+    btn.style.cssText = 'background:none;border:1px solid #331a00;color:var(--fire-inner);font-size:.5rem;padding:2px 6px;border-radius:3px;cursor:pointer;margin-left:6px;font-family:inherit;vertical-align:middle;';
+    btn.onclick = (e) => { e.stopPropagation(); showQRModal(addr, el.previousElementSibling?.textContent?.trim() || 'Contract Address'); };
+    el.after(btn);
+});
+
+const _shareBtn = document.getElementById('shareAfterBurn');
+if (_shareBtn) {
+    _shareBtn.addEventListener('click', () => {
+        shareToX(_shareBtn.dataset.sym || '?', _shareBtn.dataset.amount || '?', _shareBtn.dataset.tx || '');
+    });
+}
+
+const _notifBtn = document.getElementById('notifBtn');
+if (_notifBtn) {
+    _notifBtn.addEventListener('click', requestBrowserNotif);
+    if ('Notification' in window && Notification.permission !== 'default') {
+        _notifBtn.style.display = 'none';
+    }
+}
+
+(function initNewFeatures() {
+    renderBadgesPanel();
+    renderStreakBadge();
+    const hist = loadBurnHistory();
+    if (hist.length > 0) {
+        renderBurnHistory();
+        renderTopTokens();
+        const ss = document.getElementById('statsHistorySection');
+        if (ss) ss.style.display = 'block';
+    }
+})();
+
+function showWrongNetworkModal() {
+    const existing = document.getElementById('wrongNetworkModal');
+    if (existing) return; // already showing
+
+    const isId = currentLang === 'id';
+    const overlay = document.createElement('div');
+    overlay.id = 'wrongNetworkModal';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);animation:overlayIn .25s ease both;';
+
+    overlay.innerHTML = `
+        <div style="background:linear-gradient(160deg,#1a0800,#0f0502);border:1px solid #cc1a00;border-radius:12px;padding:30px 26px;max-width:360px;width:90%;font-family:'Share Tech Mono',monospace;box-shadow:0 0 60px rgba(255,50,0,.4);text-align:center;animation:modalIn .3s ease both;">
+            <div style="font-size:2.2rem;margin-bottom:8px;">⛓️</div>
+            <div style="font-size:.75rem;color:#ff3300;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:6px;">
+                ${isId ? 'Network Salah!' : 'Wrong Network!'}
+            </div>
+            <div style="font-size:.58rem;color:var(--text-ash);letter-spacing:.06em;margin-bottom:20px;">
+                // ${isId ? 'inpoburn hanya berjalan di base mainnet' : 'inpoburn only runs on base mainnet'} //
+            </div>
+
+            <div style="background:rgba(255,50,0,.07);border:1px solid rgba(255,50,0,.2);border-radius:8px;padding:14px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:.55rem;color:var(--text-ash);">${isId ? 'NETWORK SEKARANG' : 'CURRENT NETWORK'}</span>
+                    <span id="wnmCurrentNet" style="font-size:.6rem;color:#ff6666;font-weight:700;">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:.55rem;color:var(--text-ash);">${isId ? 'NETWORK DIBUTUHKAN' : 'REQUIRED NETWORK'}</span>
+                    <span style="font-size:.6rem;color:#66ff99;font-weight:700;">Base Mainnet (8453)</span>
+                </div>
+            </div>
+
+            <button id="wnmSwitchBtn" style="width:100%;padding:12px;background:linear-gradient(90deg,#cc1a00,#ff5500);border:none;color:#fff;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;cursor:pointer;border-radius:6px;margin-bottom:10px;transition:opacity .2s;">
+                🔄 ${isId ? 'Ganti ke Base Mainnet' : 'Switch to Base Mainnet'}
+            </button>
+
+            <button id="wnmDisconnectBtn" style="width:100%;padding:9px;background:rgba(255,255,255,.04);border:1px solid #333;color:#888;font-family:'Share Tech Mono',monospace;font-size:.6rem;cursor:pointer;border-radius:6px;">
+                ${isId ? '✖ Putuskan Wallet' : '✖ Disconnect Wallet'}
+            </button>
+
+            <div style="margin-top:14px;font-size:.5rem;color:#444;line-height:1.6;">
+                ${isId
+                    ? '⚠️ Semua fitur burn dinonaktifkan sementara kamu berada di network yang salah.'
+                    : '⚠️ All burn features are disabled while you\'re on the wrong network.'}
+            </div>
+        </div>`;
+
+    document.body.appendChild(overlay);
+
+    (async () => {
+        try {
+            const tempProv = new ethers.BrowserProvider(window.ethereum);
+            const net = await tempProv.getNetwork();
+            const chainId = Number(net.chainId);
+            const names = { 1:'Ethereum Mainnet', 56:'BSC', 137:'Polygon', 42161:'Arbitrum', 10:'Optimism', 43114:'Avalanche' };
+            const netEl = document.getElementById('wnmCurrentNet');
+            if (netEl) netEl.textContent = names[chainId] || `Chain ${chainId}`;
+        } catch {}
+    })();
+
+    document.getElementById('wnmSwitchBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('wnmSwitchBtn');
+        btn.textContent = isId ? '⏳ Mengganti...' : '⏳ Switching...';
+        btn.style.opacity = '.6';
+        btn.disabled = true;
+        try {
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+        } catch (err) {
+            if (err.code === 4902) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{ chainId:'0x2105', chainName:'Base', nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18}, rpcUrls:['https://mainnet.base.org'], blockExplorerUrls:['https://basescan.org'] }]
+                    });
+                } catch (addErr) {
+                    btn.textContent = isId ? '❌ Gagal menambah network' : '❌ Failed to add network';
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                    return;
+                }
+            } else if (err.code === 4001) {
+                btn.textContent = isId ? '❌ Ditolak pengguna' : '❌ Rejected by user';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            } else {
+                btn.textContent = isId ? '❌ Gagal mengganti' : '❌ Switch failed';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            }
+        }
+    });
+
+    document.getElementById('wnmDisconnectBtn').addEventListener('click', () => {
+        overlay.remove();
+        disconnectWallet();
+    });
 }
